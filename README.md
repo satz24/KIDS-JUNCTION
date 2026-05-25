@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kids Junction — Informative Showcase Website
+
+A modern, premium **informative** website for Kids Junction — a kids clothing & toys shop in Guduvanchery. This is **not** an e-commerce site. Products are showcased with names and prices; customers visit the store or contact via WhatsApp/Instagram.
+
+## Features
+
+- **Hero** — Animated intro with Explore Collection, Visit Store, Contact Us CTAs
+- **Product Showcase** — Category filters, hover cards, modal with WhatsApp inquiry
+- **About** — Shop story, trust highlights, animated stats
+- **Gallery** — Instagram-style masonry layout
+- **Testimonials** — Parent reviews carousel
+- **Contact** — Google Maps, store timings, phone, WhatsApp, social links
+- **Floating WhatsApp button** — Always accessible on mobile & desktop
+- **Dark/light mode**, scroll animations, mobile bottom nav
+
+## Tech Stack
+
+Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · Radix UI
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Store Details
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Configured in `src/lib/data/store.ts`:
 
-## Learn More
+- **Address:** # 133, G.S.T. Road, Guduvanchery - 603 202
+- **Phone:** 044-4775 8868
+- **WhatsApp:** 9789 883 773
+- **Instagram:** @kj_kutties
+- **Facebook:** KJ kutties
 
-To learn more about Next.js, take a look at the following resources:
+## Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Route | Purpose |
+|---|---|
+| `/` | Full informative homepage |
+| `/collection` | Complete product catalog |
+| `/shop`, `/cart`, `/checkout` | Redirect to collection/contact |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private — All rights reserved.
