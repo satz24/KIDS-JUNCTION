@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getFeaturedProducts, getTrendingProducts } from "@/lib/data/products";
 
+export const dynamic = "force-static";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("productId");

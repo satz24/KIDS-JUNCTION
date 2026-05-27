@@ -11,7 +11,7 @@ export function useGoogleReviews() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/google-reviews")
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/google-reviews`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load reviews");
         return res.json() as Promise<GoogleReviewsData>;

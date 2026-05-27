@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe/server";
 
+export const dynamic = "force-static";
+
 interface CheckoutItem {
   id: string;
   name: string;

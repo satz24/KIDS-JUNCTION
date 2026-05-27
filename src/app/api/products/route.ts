@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { products, searchProducts } from "@/lib/data/products";
 
+export const dynamic = "force-static";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q") ?? "";

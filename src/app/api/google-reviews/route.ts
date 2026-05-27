@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchGoogleReviews } from "@/lib/google-reviews";
 
+export const dynamic = "force-static";
 export const revalidate = 3600;
 
 export async function GET() {
