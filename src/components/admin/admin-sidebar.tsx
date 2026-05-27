@@ -12,7 +12,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LogoMark } from "@/components/brand/logo";
+import { LogoMark, BrandName } from "@/components/brand/logo";
 
 const sidebarLinks = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -29,12 +29,9 @@ export function AdminSidebar() {
   return (
     <aside className="w-64 shrink-0 border-r bg-card min-h-screen hidden md:block">
       <div className="p-6 border-b">
-        <Link href="/admin" className="flex items-center gap-2">
-          <LogoMark />
-          <span className="font-display font-bold text-sm">
-            <span className="text-brand-green">KJ</span>{" "}
-            <span className="text-muted-foreground">Admin</span>
-          </span>
+        <Link href="/admin" className="flex items-center gap-3 min-w-0">
+          <LogoMark className="h-11 w-11 text-base" />
+          <BrandName className="text-[1.65rem] sm:text-[1.9rem]" />
         </Link>
       </div>
 

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FloatingElements } from "@/components/shared/floating-elements";
-import { LogoMark } from "@/components/brand/logo";
+import { LogoMark, BrandTitle } from "@/components/brand/logo";
 import { storeInfo } from "@/lib/data/store";
 
 const trustBadges = [
@@ -43,20 +43,21 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="flex justify-center lg:justify-start"
+              className="space-y-4 flex flex-col items-center lg:items-start"
             >
               <LogoMark className="h-16 w-16 text-2xl rounded-2xl shadow-xl animate-wiggle" />
+              <BrandTitle size="lg" className="text-center lg:text-left" />
             </motion.div>
 
-            <motion.h1
+            <motion.h2
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08]"
+              className="font-display text-3xl sm:text-4xl md:text-5xl leading-[1.12]"
             >
               Where Little{" "}
               <span className="text-gradient-brand">Dreams</span> Come Alive
-            </motion.h1>
+            </motion.h2>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}

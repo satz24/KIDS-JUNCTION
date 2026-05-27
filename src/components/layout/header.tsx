@@ -64,8 +64,8 @@ export function Header() {
 
       <header className="sticky top-0 z-50 glass border-b border-border/50">
         <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between gap-3">
-            <Link href="/" className="shrink-0">
+          <div className="flex h-[4.5rem] items-center justify-between gap-3">
+            <Link href="/" className="shrink-0 min-w-0">
               <Logo size="md" />
             </Link>
 

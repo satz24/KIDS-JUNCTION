@@ -25,6 +25,12 @@ export const storeInfo = {
   mapEmbed:
     "https://maps.google.com/maps?q=133+GST+Road+Guduvanchery+603202&output=embed",
   mapQuery: "133 GST Road Guduvanchery 603202",
+  googleReviews: {
+    url: "https://www.google.com/search?q=Kids+junction+Reviews&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOa0dZ08bQ_HWYzMAue6lbt4rJ0Wjaaw6sBnyPG7KOYzhTXDyhBT_NCIQ7e0IlMtDGWgkdEE9uBFCcG8Pbn-2Fjq_t3v8",
+    mapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Kids+Junction+133+GST+Road+Guduvanchery+603202",
+    searchQuery: "Kids Junction 133 GST Road Guduvanchery 603202",
+  },
   products: [
     "Just Born Needs",
     "Kids Wear",

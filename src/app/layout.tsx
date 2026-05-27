@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Fredoka } from "next/font/google";
+import { Nunito, Emblema_One, Love_Ya_Like_A_Sister } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ClientProviders } from "@/components/providers/client-providers";
@@ -18,8 +18,16 @@ const nunito = Nunito({
   display: "swap",
 });
 
-const fredoka = Fredoka({
-  variable: "--font-fredoka",
+const loveYaLikeASister = Love_Ya_Like_A_Sister({
+  variable: "--font-love-ya",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const emblemaOne = Emblema_One({
+  variable: "--font-emblema-one",
+  weight: "400",
   subsets: ["latin"],
   display: "swap",
 });
@@ -53,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${nunito.variable} ${fredoka.variable} min-h-screen flex flex-col antialiased`}
+        className={`${nunito.variable} ${emblemaOne.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
       >
         <ThemeProvider>
           <ClientProviders>

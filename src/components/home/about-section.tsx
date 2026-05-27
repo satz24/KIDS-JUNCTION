@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Leaf, Tag, Shield, Sparkles, Users } from "lucide-react";
+import { Heart, Leaf, Tag, Shield, Sparkles, Users, ExternalLink } from "lucide-react";
 import { storeInfo } from "@/lib/data/store";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/shared/scroll-reveal";
+import { GoogleReviewsPanel } from "@/components/home/google-reviews-panel";
+import { useGoogleReviews } from "@/hooks/use-google-reviews";
 
 const highlights = [
   {
@@ -34,6 +37,26 @@ const highlights = [
 ];
 
 export function AboutSection() {
+  const { data, loading } = useGoogleReviews();
+  const googleRating = data?.rating ?? 0;
+  const googleReviewCount = data?.totalReviews ?? 0;
+  const reviewsUrl = data?.profileUrl ?? storeInfo.googleReviews.url;
+
+  const stats = [
+    { value: 10, suffix: "+", label: "Years Serving Families", href: undefined },
+    { value: 500, suffix: "+", label: "Products", href: undefined },
+    {
+      value: googleRating > 0 ? googleRating : 5,
+      suffix: "★",
+      label: loading
+        ? "Google Rating"
+        : googleReviewCount > 0
+          ? `${googleReviewCount} Google Reviews`
+          : "Google Rating",
+      href: reviewsUrl,
+    },
+  ];
+
   return (
     <section id="about" className="py-16 md:py-24 bg-gradient-to-b from-background to-brand-green/5">
       <div className="container mx-auto px-4">
@@ -43,21 +66,50 @@ export function AboutSection() {
             About <span className="text-brand-green">Kids Junction</span>
           </h2>
           <p className="text-muted-foreground leading-relaxed">{storeInfo.about}</p>
+          <div className="mt-5 flex justify-center">
+            <GoogleReviewsPanel variant="compact" />
+          </div>
         </ScrollReveal>
 
         <ScrollReveal className="grid grid-cols-3 gap-6 max-w-xl mx-auto mb-14">
-          {[
-            { value: 10, suffix: "+", label: "Years Serving Families" },
-            { value: 500, suffix: "+", label: "Products" },
-            { value: 4.9, suffix: "★", label: "Customer Rating" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center glass rounded-2xl py-4">
-              <p className="font-display text-2xl font-bold text-gradient-brand">
-                <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-            </div>
-          ))}
+          {stats.map((stat) => {
+            const content = (
+              <>
+                <p className="font-display text-2xl font-bold text-gradient-brand">
+                  <AnimatedCounter
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    decimals={stat.suffix === "★" && stat.value % 1 !== 0 ? 1 : 0}
+                  />
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              </>
+            );
+
+            if (stat.href) {
+              return (
+                <Link
+                  key={stat.label}
+                  href={stat.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group text-center glass rounded-2xl py-4 transition-all hover:shadow-lg hover:border-brand-green/30 border border-transparent"
+                >
+                  {content}
+                  <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-brand-green opacity-0 group-hover:opacity-100 transition-opacity">
+                    View on Google
+                    <ExternalLink className="h-3 w-3" />
+                  </span>
+                </Link>
+              );
+            }
+
+            return (
+              <div key={stat.label} className="text-center glass rounded-2xl py-4">
+                {content}
+              </div>
+            );
+          })}
         </ScrollReveal>
 
         <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

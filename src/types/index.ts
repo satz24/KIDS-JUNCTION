@@ -86,6 +86,25 @@ export interface Testimonial {
   comment: string;
 }
 
+export interface GoogleReview {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  comment: string;
+  date: string;
+  sourceUrl: string;
+}
+
+export interface GoogleReviewsData {
+  rating: number;
+  totalReviews: number;
+  reviews: GoogleReview[];
+  profileUrl: string;
+  mapsUrl: string;
+  source: "google" | "fallback";
+}
+
 export interface User {
   id: string;
   email: string;
