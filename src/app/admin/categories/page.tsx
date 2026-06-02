@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import {
+  countProductsInCategory,
   deleteCategory,
   fetchCategories,
+  fetchCategoryProductCounts,
+  getErrorMessage,
   slugify,
   upsertCategory,
   isSupabaseConfigured,
@@ -18,13 +21,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<DbCategory[]>([]);
+  const [productCounts, setProductCounts] = useState<Record<string, number>>({});
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DbCategory | null>(null);
   const [form, setForm] = useState({ id: "", name: "", image_url: "/brand/KJ_final.jpg" });
+  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {
-    const data = await fetchCategories();
-    setCategories(data);
+    try {
+      const [data, counts] = await Promise.all([fetchCategories(), fetchCategoryProductCounts()]);
+      setCategories(data);
+      setProductCounts(counts);
+      setError(null);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setCategories([]);
+      setProductCounts({});
+    }
   };
 
   useEffect(() => {
@@ -40,10 +54,14 @@ export default function AdminCategoriesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSupabaseConfigured) return;
-    const id = editing?.id ?? slugify(form.name);
-    await upsertCategory({ id, name: form.name, image_url: form.image_url });
-    await load();
-    resetForm();
+    try {
+      const id = editing?.id ?? slugify(form.name);
+      await upsertCategory({ id, name: form.name, image_url: form.image_url });
+      await load();
+      resetForm();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
   };
 
   const handleEdit = (cat: DbCategory) => {
@@ -52,13 +70,27 @@ export default function AdminCategoriesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete category? Products must be moved first.")) return;
+  const handleDelete = async (cat: DbCategory) => {
+    setError(null);
+    setDeletingId(cat.id);
     try {
-      await deleteCategory(id);
+      const count = productCounts[cat.id] ?? (await countProductsInCategory(cat.id));
+
+      if (count > 0) {
+        const confirmed = window.confirm(
+          `"${cat.name}" has ${count} product(s).\n\nDelete this category and all ${count} linked product(s)? This cannot be undone.`
+        );
+        if (!confirmed) return;
+      } else if (!window.confirm(`Delete "${cat.name}"?`)) {
+        return;
+      }
+
+      await deleteCategory(cat.id);
       await load();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Delete failed");
+      setError(getErrorMessage(err));
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -77,6 +109,10 @@ export default function AdminCategoriesPage() {
           <Plus className="h-4 w-4" /> Add Category
         </Button>
       </div>
+
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
 
       {showForm && (
         <Card className="glass-panel border-0">
@@ -101,19 +137,32 @@ export default function AdminCategoriesPage() {
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((cat) => (
-          <Card key={cat.id} className="glass-card border-0">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Image src={cat.image_url ?? "/brand/KJ_final.jpg"} alt={cat.name} width={56} height={56} className="rounded-full object-contain bg-white p-1" unoptimized />
-              <div className="flex-1 min-w-0">
-                <p className="font-bold truncate">{cat.name}</p>
-                <p className="text-xs text-muted-foreground">{cat.id}</p>
-              </div>
-              <Button size="icon" variant="ghost" onClick={() => handleEdit(cat)}><Pencil className="h-4 w-4" /></Button>
-              <Button size="icon" variant="ghost" onClick={() => handleDelete(cat.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-            </CardContent>
-          </Card>
-        ))}
+        {categories.map((cat) => {
+          const count = productCounts[cat.id] ?? 0;
+          return (
+            <Card key={cat.id} className="glass-card border-0">
+              <CardContent className="p-4 flex items-center gap-3">
+                <Image src={cat.image_url ?? "/brand/KJ_final.jpg"} alt={cat.name} width={56} height={56} className="rounded-full object-contain bg-white p-1" unoptimized />
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold truncate">{cat.name}</p>
+                  <p className="text-xs text-muted-foreground">{cat.id}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {count} product{count === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <Button size="icon" variant="ghost" onClick={() => handleEdit(cat)}><Pencil className="h-4 w-4" /></Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={deletingId === cat.id}
+                  onClick={() => handleDelete(cat)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

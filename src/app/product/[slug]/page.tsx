@@ -42,13 +42,13 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </Link>
 
         <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-          <div className="glass-card rounded-[2rem] overflow-hidden p-4">
+          <div className="glass-card rounded-[2rem] overflow-hidden p-4 max-w-xs mx-auto md:max-w-sm w-full">
             <Image
               src={product.images[0]}
               alt={product.name}
-              width={600}
-              height={600}
-              className="w-full aspect-square object-contain rounded-[1.5rem] bg-white"
+              width={320}
+              height={320}
+              className="w-full h-48 sm:h-52 md:h-56 object-contain rounded-[1.5rem] bg-white mx-auto"
               priority
               unoptimized={product.images[0].startsWith("http") === false}
             />

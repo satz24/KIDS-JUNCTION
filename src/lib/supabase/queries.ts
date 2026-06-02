@@ -4,6 +4,18 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export { supabase, isSupabaseConfigured };
 
+export function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "object" && err !== null && "message" in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return "Something went wrong";
+}
+
+function throwQueryError(error: { message: string }): never {
+  throw new Error(error.message);
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -42,7 +54,7 @@ export async function fetchCategories(): Promise<DbCategory[]> {
     .from("categories")
     .select("*")
     .order("name");
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data ?? [];
 }
 
@@ -53,7 +65,7 @@ export async function fetchCategoryById(id: string): Promise<DbCategory | null> 
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data;
 }
 
@@ -68,7 +80,7 @@ export async function fetchProducts(options?: {
   if (options?.featured) query = query.eq("featured", true);
   if (options?.limit) query = query.limit(options.limit);
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return (data as DbProduct[]).map(mapDbProduct);
 }
 
@@ -79,7 +91,7 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data ? mapDbProduct(data as DbProduct) : null;
 }
 
@@ -90,7 +102,7 @@ export async function fetchProductById(id: string): Promise<Product | null> {
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data ? mapDbProduct(data as DbProduct) : null;
 }
 
@@ -101,7 +113,7 @@ export async function searchProductsQuery(query: string): Promise<Product[]> {
     .select("*")
     .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
     .limit(8);
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return (data as DbProduct[]).map(mapDbProduct);
 }
 
@@ -125,7 +137,7 @@ export async function createOrder(params: {
     })
     .select()
     .single();
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data as DbOrder;
 }
 
@@ -135,14 +147,14 @@ export async function fetchOrders(): Promise<DbOrder[]> {
     .from("orders")
     .select("*")
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return (data as DbOrder[]) ?? [];
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<void> {
   if (!supabase) throw new Error("Supabase not configured");
   const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-  if (error) throw error;
+  if (error) throwQueryError(error);
 }
 
 export async function upsertCategory(category: {
@@ -152,13 +164,41 @@ export async function upsertCategory(category: {
 }): Promise<void> {
   if (!supabase) throw new Error("Supabase not configured");
   const { error } = await supabase.from("categories").upsert(category);
-  if (error) throw error;
+  if (error) throwQueryError(error);
+}
+
+export async function countProductsInCategory(categoryId: string): Promise<number> {
+  if (!supabase) return 0;
+  const { count, error } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("category_id", categoryId);
+  if (error) throwQueryError(error);
+  return count ?? 0;
+}
+
+export async function fetchCategoryProductCounts(): Promise<Record<string, number>> {
+  if (!supabase) return {};
+  const { data, error } = await supabase.from("products").select("category_id");
+  if (error) throwQueryError(error);
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;
+  }
+  return counts;
 }
 
 export async function deleteCategory(id: string): Promise<void> {
   if (!supabase) throw new Error("Supabase not configured");
+
+  const { error: productsError } = await supabase
+    .from("products")
+    .delete()
+    .eq("category_id", id);
+  if (productsError) throwQueryError(productsError);
+
   const { error } = await supabase.from("categories").delete().eq("id", id);
-  if (error) throw error;
+  if (error) throwQueryError(error);
 }
 
 export async function upsertProduct(product: {
@@ -179,14 +219,14 @@ export async function upsertProduct(product: {
     .upsert(payload)
     .select()
     .single();
-  if (error) throw error;
+  if (error) throwQueryError(error);
   return data as DbProduct;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
   if (!supabase) throw new Error("Supabase not configured");
   const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) throw error;
+  if (error) throwQueryError(error);
 }
 
 export async function uploadProductImage(file: File): Promise<string> {
@@ -197,7 +237,7 @@ export async function uploadProductImage(file: File): Promise<string> {
     cacheControl: "3600",
     upsert: false,
   });
-  if (error) throw error;
+  if (error) throwQueryError(error);
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
   return data.publicUrl;
 }

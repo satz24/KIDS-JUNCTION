@@ -1,11 +1,13 @@
 -- =============================================================================
--- Kids Junction — Complete Supabase Setup (single file)
+-- Kids Junction — Complete Supabase Setup (SINGLE FILE — run this only)
 -- =============================================================================
+-- Includes: tables, indexes, storage bucket, RLS policies, table grants, seed data
+--
 -- How to use:
---   1. Open your Supabase project → SQL Editor → New query
---   2. Paste this entire file and click Run
+--   1. Open Supabase → SQL Editor → New query
+--   2. Paste this entire file and click Run (safe to re-run)
 --   3. Create an admin user in Authentication → Users
---   4. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local
+--   4. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -25,7 +27,7 @@ create table if not exists public.products (
   slug text not null unique,
   description text default '',
   price numeric(10, 2) not null check (price >= 0),
-  category_id text not null references public.categories (id) on delete restrict,
+  category_id text not null references public.categories (id) on delete cascade,
   image_url text,
   stock integer not null default 0 check (stock >= 0),
   featured boolean not null default false,
@@ -49,6 +51,12 @@ create table if not exists public.orders (
 
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
 create index if not exists orders_status_idx on public.orders (status);
+
+-- Category delete removes linked products (safe to re-run on existing projects)
+alter table public.products drop constraint if exists products_category_id_fkey;
+alter table public.products
+  add constraint products_category_id_fkey
+  foreign key (category_id) references public.categories (id) on delete cascade;
 
 -- -----------------------------------------------------------------------------
 -- STORAGE BUCKET (product image uploads from admin)
@@ -140,6 +148,24 @@ create policy "product_images_admin_delete"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'product-images');
+
+-- -----------------------------------------------------------------------------
+-- TABLE GRANTS (RLS policies alone are not enough — roles need table privileges)
+-- -----------------------------------------------------------------------------
+
+grant usage on schema public to anon, authenticated;
+
+grant select on public.categories to anon, authenticated;
+grant insert, update, delete on public.categories to authenticated;
+
+grant select on public.products to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+
+grant insert on public.orders to anon, authenticated;
+grant select, update on public.orders to authenticated;
+
+grant select on storage.objects to anon, authenticated;
+grant insert, update, delete on storage.objects to authenticated;
 
 -- -----------------------------------------------------------------------------
 -- SEED DATA — 10 categories + 1 sample product each

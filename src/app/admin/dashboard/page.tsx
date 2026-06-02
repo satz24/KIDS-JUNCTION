@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Package, Grid3X3, ShoppingBag, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getDashboardStats, isSupabaseConfigured } from "@/lib/supabase/queries";
+import { getDashboardStats, getErrorMessage, isSupabaseConfigured } from "@/lib/supabase/queries";
 import type { DbOrder } from "@/types/database";
 import { formatPrice } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ export default function AdminDashboardPage() {
     recentOrders: [] as DbOrder[],
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -23,7 +24,11 @@ export default function AdminDashboardPage() {
       return;
     }
     getDashboardStats()
-      .then(setStats)
+      .then((data) => {
+        setStats(data);
+        setError(null);
+      })
+      .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -42,6 +47,16 @@ export default function AdminDashboardPage() {
         </h1>
         <p className="text-muted-foreground mt-1">Overview of your Kids Junction store</p>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <p className="font-semibold">Could not load dashboard data</p>
+          <p className="mt-1">{error}</p>
+          <p className="mt-2 text-muted-foreground">
+            Run <code className="text-xs">supabase/setup.sql</code> in your Supabase SQL Editor, then refresh.
+          </p>
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-3 gap-4">
         {cards.map(({ label, value, icon: Icon, color }) => (

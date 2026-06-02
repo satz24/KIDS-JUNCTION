@@ -95,7 +95,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           <ScrollReveal>
             <div className="space-y-4">
-              <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted group">
+              <div className="relative aspect-square overflow-hidden rounded-2xl bg-white group max-w-sm mx-auto w-full">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={selectedImage}
@@ -109,7 +109,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                       alt={product.name}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover product-image-zoom"
+                      className="object-contain p-4 product-image-zoom"
                       priority
                     />
                   </motion.div>

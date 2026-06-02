@@ -10,6 +10,7 @@ import { getCategoryName } from "@/lib/data/categories";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useToastStore } from "@/lib/store/toast-store";
 import { formatPrice } from "@/lib/utils";
+import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -36,14 +37,15 @@ export function ShowcaseCard({ product, index = 0, onSelect }: ShowcaseCardProps
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group text-left w-full"
+      className="group text-left w-full max-w-[220px] mx-auto"
     >
       <TiltCard className="relative">
         <button
           type="button"
           onClick={() => onSelect(product)}
           className={cn(
-            "relative overflow-hidden glass-card aspect-[4/5] mb-4 w-full block transition-all duration-500",
+            "relative overflow-hidden glass-card mb-3 w-full block transition-all duration-500",
+            productThumbContainerClass,
             blobClass
           )}
         >
@@ -51,8 +53,8 @@ export function ShowcaseCard({ product, index = 0, onSelect }: ShowcaseCardProps
             src={product.images[0]}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover product-image-zoom"
+            sizes="(max-width: 768px) 45vw, 180px"
+            className={cn(productThumbImageClass, "product-image-zoom")}
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-brand-pink/20 via-transparent to-brand-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />

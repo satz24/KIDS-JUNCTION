@@ -11,6 +11,7 @@ import { getCategoryName } from "@/lib/data/categories";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useToastStore } from "@/lib/store/toast-store";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
+import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -65,12 +66,12 @@ export function ProductInquiryModal({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="relative aspect-[4/3] sm:aspect-video bg-muted">
+          <div className={cn(productThumbContainerClass, "h-36 sm:h-40 bg-muted")}>
             <Image
               src={product.images[0]}
               alt={product.name}
               fill
-              className="object-cover"
+              className={productThumbImageClass}
               sizes="(max-width: 768px) 100vw, 672px"
               priority
             />

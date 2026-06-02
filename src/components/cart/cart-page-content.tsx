@@ -15,6 +15,7 @@ import {
   Phone,
   MapPin,
   Navigation,
+  StickyNote,
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export function CartPageContent() {
     address: "",
     landmark: "",
     pincode: "",
+    notes: "",
   });
 
   const subtotal = getSubtotal();
@@ -55,7 +57,14 @@ export function CartPageContent() {
       setErrors(validationErrors);
       return;
     }
-    const fullAddress = [form.address, form.landmark, form.pincode].filter(Boolean).join(", ");
+    const fullAddress = [
+      form.address,
+      form.landmark,
+      form.pincode,
+      form.notes.trim() ? `Note: ${form.notes.trim()}` : null,
+    ]
+      .filter(Boolean)
+      .join(", ");
     try {
       const { createOrder, isSupabaseConfigured } = await import("@/lib/supabase/queries");
       if (isSupabaseConfigured) {
@@ -80,7 +89,7 @@ export function CartPageContent() {
     openWhatsAppOrder(items, form, subtotal);
     clearCart();
     setStep("cart");
-    setForm({ fullName: "", phone: "", address: "", landmark: "", pincode: "" });
+    setForm({ fullName: "", phone: "", address: "", landmark: "", pincode: "", notes: "" });
   };
 
   if (items.length === 0 && step === "cart") {
@@ -165,13 +174,13 @@ export function CartPageContent() {
                     exit={{ opacity: 0, x: 20 }}
                     className="flex gap-4 p-4 rounded-2xl glass-card"
                   >
-                    <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden bg-muted">
+                    <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-white">
                       <Image
                         src={item.product.images[0]}
                         alt={item.product.name}
                         fill
-                        className="object-cover"
-                        sizes="96px"
+                        className="object-contain p-1.5"
+                        sizes="80px"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -331,6 +340,23 @@ export function CartPageContent() {
                     {errors.pincode && (
                       <p className="text-xs text-destructive mt-1">{errors.pincode}</p>
                     )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes" className="flex items-center gap-1.5 mb-1.5">
+                      <StickyNote className="h-3.5 w-3.5" /> Order Notes
+                    </Label>
+                    <textarea
+                      id="notes"
+                      rows={3}
+                      placeholder="Any special requests, size/colour preferences, delivery instructions, etc."
+                      value={form.notes}
+                      onChange={(e) => updateField("notes", e.target.value)}
+                      className="flex w-full rounded-xl border surface-input px-4 py-3 text-sm transition-all duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y min-h-[5.5rem]"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Optional — tell us anything you need for this order
+                    </p>
                   </div>
                 </div>
 

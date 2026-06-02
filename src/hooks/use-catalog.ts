@@ -6,6 +6,7 @@ import type { Product } from "@/types";
 import {
   fetchCategories,
   fetchProducts,
+  getErrorMessage,
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
 import { products as staticProducts } from "@/lib/data/products";
@@ -40,7 +41,7 @@ export function useCategories() {
       setCategories(data.length > 0 ? data : STATIC_CATEGORY_MAP);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load categories");
+      setError(getErrorMessage(e));
       setCategories(STATIC_CATEGORY_MAP);
     } finally {
       setLoading(false);
@@ -80,7 +81,7 @@ export function useProducts(options?: { categoryId?: string; featured?: boolean;
       setProducts(fallback);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load products");
+      setError(getErrorMessage(e));
       setProducts([]);
     } finally {
       setLoading(false);

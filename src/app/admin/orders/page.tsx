@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchOrders, updateOrderStatus, isSupabaseConfigured } from "@/lib/supabase/queries";
+import { fetchOrders, getErrorMessage, updateOrderStatus, isSupabaseConfigured } from "@/lib/supabase/queries";
 import type { DbOrder, OrderStatus } from "@/types/database";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,12 +12,20 @@ const statuses: OrderStatus[] = ["pending", "confirmed", "processing", "complete
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<DbOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
-    const data = await fetchOrders();
-    setOrders(data);
-    setLoading(false);
+    try {
+      const data = await fetchOrders();
+      setOrders(data);
+      setError(null);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -39,6 +47,10 @@ export default function AdminOrdersPage() {
         <h1 className="font-display text-3xl font-bold">Orders</h1>
         <p className="text-muted-foreground text-sm">WhatsApp orders from customers</p>
       </div>
+
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
 
       {loading ? (
         <p className="text-muted-foreground">Loading orders...</p>

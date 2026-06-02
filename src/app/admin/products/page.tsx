@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Plus, Pencil, Trash2, Search, Upload } from "lucide-react";
 import {
   deleteProduct,
   fetchCategories,
+  getErrorMessage,
   slugify,
   upsertProduct,
   uploadProductImage,
@@ -35,30 +36,74 @@ export default function AdminProductsPage() {
     featured: false,
     image_url: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
-    const [p, c] = await Promise.all([
-      isSupabaseConfigured
-        ? (async () => {
-            const { supabase } = await import("@/lib/supabase/client");
-            if (!supabase) return [];
-            const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-            return (data as DbProduct[]) ?? [];
-          })()
-        : [],
-      fetchCategories(),
-    ]);
-    setProducts(p);
-    setCategories(c);
+    try {
+      const [p, c] = await Promise.all([
+        isSupabaseConfigured
+          ? (async () => {
+              const { supabase } = await import("@/lib/supabase/client");
+              if (!supabase) return [];
+              const { data, error: productsError } = await supabase
+                .from("products")
+                .select("*")
+                .order("name");
+              if (productsError) throw new Error(productsError.message);
+              return (data as DbProduct[]) ?? [];
+            })()
+          : [],
+        fetchCategories(),
+      ]);
+      setProducts(p);
+      setCategories(c);
+      setError(null);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setProducts([]);
+      setCategories([]);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const productSections = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const filtered = query
+      ? products.filter((p) => p.name.toLowerCase().includes(query))
+      : products;
+
+    const sections = categories.map((category) => ({
+      category,
+      products: filtered.filter((p) => p.category_id === category.id),
+    }));
+
+    const knownIds = new Set(categories.map((c) => c.id));
+    const uncategorized = filtered.filter((p) => !knownIds.has(p.category_id));
+    if (uncategorized.length > 0) {
+      sections.push({
+        category: {
+          id: "uncategorized",
+          name: "Uncategorized",
+          image_url: null,
+          created_at: "",
+        },
+        products: uncategorized,
+      });
+    }
+
+    return query ? sections.filter((section) => section.products.length > 0) : sections;
+  }, [products, categories, search]);
+
+  const openAddForm = (categoryId?: string) => {
+    resetForm();
+    if (categoryId) {
+      setForm((f) => ({ ...f, category_id: categoryId }));
+    }
+    setShowForm(true);
+  };
 
   const resetForm = () => {
     setForm({
@@ -141,7 +186,7 @@ export default function AdminProductsPage() {
           <h1 className="font-display text-3xl font-bold">Products</h1>
           <p className="text-muted-foreground text-sm">Changes appear on the website instantly</p>
         </div>
-        <Button variant="gradient" onClick={() => { resetForm(); setShowForm(true); }}>
+        <Button variant="gradient" onClick={() => openAddForm()}>
           <Plus className="h-4 w-4" /> Add Product
         </Button>
       </div>
@@ -150,6 +195,10 @@ export default function AdminProductsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input className="pl-10 surface-input" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
+
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
 
       {showForm && (
         <Card className="glass-panel border-0">
@@ -212,32 +261,78 @@ export default function AdminProductsPage() {
         </Card>
       )}
 
-      <div className="grid gap-4">
-        {filtered.map((product) => (
-          <Card key={product.id} className="glass-card border-0">
-            <CardContent className="flex items-center gap-4 p-4">
-              <Image
-                src={product.image_url ?? "/brand/KJ_final.jpg"}
-                alt={product.name}
-                width={64}
-                height={64}
-                className="rounded-xl object-cover shrink-0"
-                unoptimized
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-bold truncate">{product.name}</p>
-                  {product.featured && <Badge className="bg-brand-pink text-white border-0">Featured</Badge>}
+      <div className="space-y-8">
+        {productSections.map(({ category, products: sectionProducts }) => (
+          <section key={category.id} className="space-y-3">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--glass-border)] pb-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <Image
+                  src={category.image_url ?? "/brand/KJ_final.jpg"}
+                  alt={category.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-contain bg-white p-1 shrink-0"
+                  unoptimized
+                />
+                <div className="min-w-0">
+                  <h2 className="font-display text-xl font-bold truncate">{category.name}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {sectionProducts.length} product{sectionProducts.length === 1 ? "" : "s"}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">{formatPrice(Number(product.price))} · Stock: {product.stock}</p>
               </div>
-              <div className="flex gap-1 shrink-0">
-                <Button size="icon" variant="ghost" onClick={() => handleEdit(product)}><Pencil className="h-4 w-4" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => handleDelete(product.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              {category.id !== "uncategorized" && (
+                <Button size="sm" variant="outline" onClick={() => openAddForm(category.id)}>
+                  <Plus className="h-3.5 w-3.5" /> Add to {category.name}
+                </Button>
+              )}
+            </div>
+
+            {sectionProducts.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4">No products in this category yet.</p>
+            ) : (
+              <div className="grid gap-3">
+                {sectionProducts.map((product) => (
+                  <Card key={product.id} className="glass-card border-0">
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <Image
+                        src={product.image_url ?? "/brand/KJ_final.jpg"}
+                        alt={product.name}
+                        width={64}
+                        height={64}
+                        className="rounded-xl object-contain bg-white p-1 shrink-0"
+                        unoptimized
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold truncate">{product.name}</p>
+                          {product.featured && (
+                            <Badge className="bg-brand-pink text-white border-0">Featured</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {formatPrice(Number(product.price))} · Stock: {product.stock}
+                        </p>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button size="icon" variant="ghost" onClick={() => handleEdit(product)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </section>
         ))}
+
+        {productSections.every((section) => section.products.length === 0) && (
+          <p className="text-center text-muted-foreground py-12">No products match your search.</p>
+        )}
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useWishlistStore } from "@/lib/store/wishlist-store";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
+import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -42,16 +43,16 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className={cn("group", className)}
+      className={cn("group max-w-[220px] mx-auto w-full", className)}
     >
       <Link href={`/product/${product.slug}`}>
-        <div className="relative overflow-hidden rounded-2xl bg-muted aspect-square mb-3">
+        <div className={cn(productThumbContainerClass, "mb-3 bg-muted")}>
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover product-image-zoom"
+            sizes="(max-width: 768px) 45vw, 180px"
+            className={cn(productThumbImageClass, "product-image-zoom")}
             loading="lazy"
           />
 

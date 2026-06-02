@@ -8,6 +8,7 @@ export interface CustomerOrderDetails {
   address: string;
   landmark: string;
   pincode: string;
+  notes: string;
 }
 
 export function buildWhatsAppOrderMessage(
@@ -28,6 +29,9 @@ export function buildWhatsAppOrderMessage(
   }
   if (customer.pincode.trim()) {
     lines.push(`Pincode: ${customer.pincode}`);
+  }
+  if (customer.notes.trim()) {
+    lines.push("", `Customer Notes: ${customer.notes.trim()}`);
   }
 
   lines.push("", "Ordered Items:", "");

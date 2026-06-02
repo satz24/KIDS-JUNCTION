@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu,
-  X,
   MessageCircle,
   ShoppingBag,
   Search,
@@ -68,7 +66,6 @@ function NavTab({
 }
 
 export function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -221,61 +218,9 @@ export function Header() {
                   <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                   WhatsApp
                 </a>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="lg:hidden nav-icon-btn rounded-xl"
-                  onClick={() => setMobileOpen(!mobileOpen)}
-                  aria-label={mobileOpen ? "Close menu" : "Open menu"}
-                >
-                  {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                </Button>
               </div>
             </div>
           </div>
-
-          <AnimatePresence>
-            {mobileOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="lg:hidden border-t border-[var(--border-color)] overflow-hidden rounded-b-[1.75rem]"
-              >
-                <nav className="container mx-auto px-4 py-4 grid grid-cols-2 gap-2">
-                  {navLinks.map((link) => (
-                    <NavTab
-                      key={link.href}
-                      {...link}
-                      onClick={() => setMobileOpen(false)}
-                      className="justify-center py-3"
-                    />
-                  ))}
-                </nav>
-                <div className="container mx-auto px-4 pb-4 flex flex-col gap-2 sm:flex-row">
-                  <Link
-                    href="/cart"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 nav-icon-btn nav-icon-btn-cart h-11 gap-2 text-sm font-bold text-foreground w-full"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    Cart {itemCount > 0 && `(${itemCount})`}
-                  </Link>
-                  <a
-                    href={storeInfo.whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 nav-whatsapp-bubble justify-center py-3"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    WhatsApp
-                  </a>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.header>
       </div>
     </>
