@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useWishlistStore } from "@/lib/store/wishlist-store";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
 import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
@@ -48,7 +49,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
       <Link href={`/product/${product.slug}`}>
         <div className={cn(productThumbContainerClass, "mb-3 bg-muted")}>
           <Image
-            src={product.images[0]}
+            src={resolveImageSrc(product.images[0])}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 45vw, 180px"

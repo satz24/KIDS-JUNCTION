@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useCategories } from "@/hooks/use-catalog";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { cn } from "@/lib/utils";
 
 export function CollectionsSection() {
@@ -58,13 +59,13 @@ export function CollectionsSection() {
                       )}
                     >
                       <Image
-                        src={collection.image_url ?? "/brand/KJ_final.jpg"}
+                        src={resolveImageSrc(collection.image_url)}
                         alt={collection.name}
                         width={120}
                         height={120}
                         className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
-                        unoptimized={(collection.image_url ?? "").startsWith("http") === false}
+                        unoptimized
                       />
                     </div>
                     <p className="mt-3 text-center text-xs sm:text-sm font-bold text-brand-pink leading-tight max-w-[6.5rem] group-hover:text-brand-pink-dark transition-colors">

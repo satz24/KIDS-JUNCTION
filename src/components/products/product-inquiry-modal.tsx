@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { getCategoryName } from "@/lib/data/categories";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useToastStore } from "@/lib/store/toast-store";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
 import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
@@ -68,7 +69,7 @@ export function ProductInquiryModal({
         >
           <div className={cn(productThumbContainerClass, "h-36 sm:h-40 bg-muted")}>
             <Image
-              src={product.images[0]}
+              src={resolveImageSrc(product.images[0])}
               alt={product.name}
               fill
               className={productThumbImageClass}

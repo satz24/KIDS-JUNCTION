@@ -9,6 +9,7 @@ import { TiltCard } from "@/components/shared/tilt-card";
 import { getCategoryName } from "@/lib/data/categories";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useToastStore } from "@/lib/store/toast-store";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { formatPrice } from "@/lib/utils";
 import { productThumbContainerClass, productThumbImageClass } from "@/lib/product-image-styles";
 import type { Product } from "@/types";
@@ -50,7 +51,7 @@ export function ShowcaseCard({ product, index = 0, onSelect }: ShowcaseCardProps
           )}
         >
           <Image
-            src={product.images[0]}
+            src={resolveImageSrc(product.images[0])}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 45vw, 180px"

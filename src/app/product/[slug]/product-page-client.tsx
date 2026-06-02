@@ -8,6 +8,7 @@ import { useProduct } from "@/hooks/use-catalog";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useToastStore } from "@/lib/store/toast-store";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { formatPrice } from "@/lib/utils";
 
 export function ProductPageClient({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,13 +45,13 @@ export function ProductPageClient({ params }: { params: Promise<{ slug: string }
         <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
           <div className="glass-card rounded-[2rem] overflow-hidden p-4 max-w-xs mx-auto md:max-w-sm w-full">
             <Image
-              src={product.images[0]}
+              src={resolveImageSrc(product.images[0])}
               alt={product.name}
               width={320}
               height={320}
               className="w-full h-48 sm:h-52 md:h-56 object-contain rounded-[1.5rem] bg-white mx-auto"
               priority
-              unoptimized={product.images[0].startsWith("http") === false}
+              unoptimized={!product.images[0].startsWith("http")}
             />
           </div>
           <div className="space-y-6">

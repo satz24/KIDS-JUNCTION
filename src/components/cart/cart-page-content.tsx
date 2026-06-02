@@ -21,6 +21,7 @@ import { useCartStore } from "@/lib/store/cart-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { formatPrice } from "@/lib/utils";
 import {
   type CustomerOrderDetails,
@@ -176,7 +177,7 @@ export function CartPageContent() {
                   >
                     <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-white">
                       <Image
-                        src={item.product.images[0]}
+                        src={resolveImageSrc(item.product.images[0])}
                         alt={item.product.name}
                         fill
                         className="object-contain p-1.5"

@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { storeInfo } from "@/lib/data/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -162,7 +163,7 @@ export function Header() {
                           className="flex items-center gap-3 p-3 hover:bg-brand-pink/5 transition-colors"
                         >
                           <Image
-                            src={product.images[0]}
+                            src={resolveImageSrc(product.images[0])}
                             alt={product.name}
                             width={44}
                             height={44}

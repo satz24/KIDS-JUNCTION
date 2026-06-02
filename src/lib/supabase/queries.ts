@@ -1,3 +1,4 @@
+import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import type { DbCategory, DbOrder, DbProduct, OrderCartLine, OrderStatus } from "@/types/database";
 import type { Product } from "@/types";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -26,7 +27,7 @@ export function slugify(text: string): string {
 }
 
 export function mapDbProduct(row: DbProduct): Product {
-  const image = row.image_url ?? "/brand/KJ_final.jpg";
+  const image = resolveImageSrc(row.image_url);
   return {
     id: row.id,
     slug: row.slug,
