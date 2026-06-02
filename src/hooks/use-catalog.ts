@@ -10,7 +10,7 @@ import {
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
 import { STORE_CATEGORIES } from "@/lib/data/store-categories";
-import { products as staticProducts } from "@/lib/data/products";
+import { STORE_PRODUCTS } from "@/lib/data/store-products";
 
 const STATIC_CATEGORY_MAP = STORE_CATEGORIES;
 
@@ -62,7 +62,7 @@ export function useProducts(options?: { categoryId?: string; featured?: boolean;
           return;
         }
       }
-      let fallback = staticProducts;
+      let fallback = STORE_PRODUCTS;
       if (options?.categoryId) {
         fallback = fallback.filter((p) => p.category === options.categoryId);
       }
