@@ -9,20 +9,10 @@ import {
   getErrorMessage,
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
+import { STORE_CATEGORIES } from "@/lib/data/store-categories";
 import { products as staticProducts } from "@/lib/data/products";
 
-const STATIC_CATEGORY_MAP: DbCategory[] = [
-  { id: "baby", name: "Baby", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "footwear", name: "Footwear", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "girls", name: "Girls", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "boys", name: "Boys", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "baby-essentials", name: "Baby Essentials", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "new-collection", name: "New Collection", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "travel-bedroom", name: "Travel & Bedroom", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "toys-school", name: "Toys & School", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "gift-sets", name: "Gift Sets", image_url: "/brand/KJ_final.jpg", created_at: "" },
-  { id: "online-gift-card", name: "Online Gift Card", image_url: "/brand/KJ_final.jpg", created_at: "" },
-];
+const STATIC_CATEGORY_MAP = STORE_CATEGORIES;
 
 export function useCategories() {
   const [categories, setCategories] = useState<DbCategory[]>(STATIC_CATEGORY_MAP);

@@ -1,16 +1,7 @@
+import { STORE_CATEGORY_IDS } from "@/lib/data/store-categories";
+
 /** Paths pre-rendered for GitHub Pages static export */
-export const STATIC_CATEGORY_IDS = [
-  "baby",
-  "footwear",
-  "girls",
-  "boys",
-  "baby-essentials",
-  "new-collection",
-  "travel-bedroom",
-  "toys-school",
-  "gift-sets",
-  "online-gift-card",
-];
+export const STATIC_CATEGORY_IDS = STORE_CATEGORY_IDS;
 
 export const STATIC_PRODUCT_SLUGS = [
   "rainbow-knit-sweater",

@@ -1,4 +1,5 @@
 import type { CategoryInfo } from "@/types";
+import { getStoreCategoryName } from "./store-categories";
 
 export const categories: CategoryInfo[] = [
   {
@@ -64,5 +65,5 @@ export function getCategoryById(id: string) {
 }
 
 export function getCategoryName(id: string) {
-  return categories.find((c) => c.id === id)?.name ?? id;
+  return getStoreCategoryName(id) ?? categories.find((c) => c.id === id)?.name ?? id.replace(/-/g, " ");
 }
