@@ -54,10 +54,10 @@ export function TestimonialsSection() {
   }, [emblaApi, displayReviews.length]);
 
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-gradient-to-b from-brand-pink/5 to-background">
+    <section id="testimonials" className="py-16 md:py-24 section-bg-blue section-glow relative theme-surface">
       <div className="container mx-auto px-4">
         <ScrollReveal className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-xs mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full surface-badge border px-4 py-1.5 text-xs mb-4">
             <GoogleLogo className="h-4 w-4" />
             <span className="text-muted-foreground">
               {loading
@@ -67,7 +67,7 @@ export function TestimonialsSection() {
                   : "Powered by Google Reviews"}
             </span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+          <h2 className="font-display heading-lg mb-3">
             Loved by <span className="text-brand-green">Parents</span>
           </h2>
           <p className="text-muted-foreground">
@@ -87,7 +87,7 @@ export function TestimonialsSection() {
               <div className="flex">
                 {displayReviews.map((t) => (
                   <div key={t.id} className="flex-[0_0_100%] min-w-0 px-4">
-                    <div className="glass rounded-3xl p-8 md:p-10 text-center shadow-lg">
+                    <div className="glass-card rounded-[2rem] p-8 md:p-10 text-center shadow-[var(--shadow-float)]">
                       <Quote className="h-8 w-8 text-brand-green/40 mx-auto mb-4" />
                       <p className="text-lg md:text-xl leading-relaxed mb-6 max-w-2xl mx-auto">
                         &ldquo;{t.comment}&rdquo;

@@ -58,7 +58,7 @@ export function AboutSection() {
   ];
 
   return (
-    <section id="about" className="py-16 md:py-24 bg-gradient-to-b from-background to-brand-green/5">
+    <section id="about" className="py-16 md:py-24 section-bg-green section-glow relative theme-surface">
       <div className="container mx-auto px-4">
         <ScrollReveal className="text-center mb-12 max-w-2xl mx-auto">
           <p className="text-brand-pink italic text-sm mb-2">{storeInfo.tagline}</p>
@@ -93,7 +93,7 @@ export function AboutSection() {
                   href={stat.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group text-center glass rounded-2xl py-4 transition-all hover:shadow-lg hover:border-brand-green/30 border border-transparent"
+                  className="group text-center glass-card rounded-3xl py-5 px-2 transition-all hover:-translate-y-1 border border-[var(--glass-border)]"
                 >
                   {content}
                   <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-brand-green opacity-0 group-hover:opacity-100 transition-opacity">
@@ -105,7 +105,7 @@ export function AboutSection() {
             }
 
             return (
-              <div key={stat.label} className="text-center glass rounded-2xl py-4">
+              <div key={stat.label} className="text-center glass-card rounded-3xl py-5 px-2">
                 {content}
               </div>
             );
@@ -117,7 +117,7 @@ export function AboutSection() {
             <StaggerItem key={item.title}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="rounded-2xl border bg-card p-6 h-full shadow-sm hover:shadow-lg transition-shadow"
+                className="rounded-3xl glass-card p-6 h-full hover:-translate-y-1 transition-all duration-300"
               >
                 <div
                   className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} mb-4 shadow-md`}

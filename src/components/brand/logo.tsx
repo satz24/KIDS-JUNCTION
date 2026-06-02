@@ -1,61 +1,57 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import {
+  BRAND_LOGO_ALT,
+  BRAND_LOGO_HEIGHT,
+  BRAND_LOGO_SRC,
+  BRAND_LOGO_WIDTH,
+} from "@/lib/brand/logo-asset";
 
 interface LogoProps {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   showName?: boolean;
   className?: string;
 }
 
-const sizeMap = {
-  sm: {
-    box: "h-10 w-10 text-base rounded-full",
-    name: "text-[1.65rem] sm:text-[1.9rem]",
-    gap: "gap-2.5",
-  },
-  md: {
-    box: "h-[3.25rem] w-[3.25rem] text-xl rounded-full",
-    name: "text-[2rem] sm:text-[2.35rem] lg:text-[2.6rem]",
-    gap: "gap-3",
-  },
-  lg: {
-    box: "h-16 w-16 text-2xl rounded-full",
-    name: "text-[2.5rem] sm:text-[3rem] lg:text-[3.5rem]",
-    gap: "gap-3.5",
-  },
+const logoSizes = {
+  sm: "h-9 w-auto max-w-[130px]",
+  md: "h-12 w-auto max-w-[170px]",
+  lg: "h-16 w-auto max-w-[220px]",
+  xl: "h-24 sm:h-32 w-auto max-w-[360px]",
 };
 
-export function BrandName({ className }: { className?: string }) {
+function BrandLogoImage({
+  size = "md",
+  className,
+  priority = false,
+}: {
+  size?: LogoProps["size"];
+  className?: string;
+  priority?: boolean;
+}) {
   return (
-    <div className={cn("font-brand whitespace-nowrap", className)}>
-      <span className="brand-name-green">KidS</span>{" "}
-      <span className="brand-name-pink">Junction</span>
-    </div>
+    <Image
+      src={BRAND_LOGO_SRC}
+      alt={BRAND_LOGO_ALT}
+      width={BRAND_LOGO_WIDTH}
+      height={BRAND_LOGO_HEIGHT}
+      priority={priority}
+      className={cn("object-contain shrink-0", logoSizes[size ?? "md"], className)}
+    />
   );
 }
 
-export function Logo({ size = "md", showName = true, className }: LogoProps) {
-  const s = sizeMap[size];
+/** @deprecated Text name is included in the logo image. Kept for compatibility. */
+export function BrandName({ className }: { className?: string }) {
+  return null;
+}
 
-  return (
-    <div className={cn("flex items-center", s.gap, className)}>
-      <LogoMark className={s.box} />
-      {showName && <BrandName className={s.name} />}
-    </div>
-  );
+export function Logo({ size = "md", className }: LogoProps) {
+  return <BrandLogoImage size={size} className={className} />;
 }
 
 export function LogoMark({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "flex items-center justify-center rounded-full font-brand bg-white dark:bg-card border-2 border-brand-green/25 brand-mark-glow shrink-0",
-        className
-      )}
-    >
-      <span className="brand-name-green text-[1em] leading-none">K</span>
-      <span className="brand-name-pink text-[1em] leading-none">J</span>
-    </div>
-  );
+  return <BrandLogoImage size="sm" className={className} />;
 }
 
 export function BrandTitle({
@@ -65,17 +61,11 @@ export function BrandTitle({
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
 }) {
-  const sizes = {
-    sm: "text-[2rem] sm:text-[2.5rem]",
-    md: "text-[2.5rem] sm:text-[3.25rem]",
-    lg: "text-[3rem] sm:text-[4rem] md:text-[4.75rem]",
-    xl: "text-[3.5rem] sm:text-[5rem] lg:text-[6rem]",
-  };
+  const titleSize = size === "sm" ? "md" : size === "md" ? "lg" : "xl";
 
   return (
-    <h1 className={cn("font-brand leading-none", sizes[size], className)}>
-      <span className="brand-name-green">KidS</span>{" "}
-      <span className="brand-name-pink">Junction</span>
-    </h1>
+    <div className={cn("flex justify-center", className)}>
+      <BrandLogoImage size={titleSize} priority />
+    </div>
   );
 }

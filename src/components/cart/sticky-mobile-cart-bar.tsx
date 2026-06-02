@@ -25,7 +25,7 @@ export function StickyMobileCartBar() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <ShoppingBag className="h-5 w-5" />
-              <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-brand-green">
+              <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full surface-badge ring-2 ring-white/30 text-[10px] font-bold text-brand-green shadow-sm">
                 {itemCount}
               </span>
             </div>

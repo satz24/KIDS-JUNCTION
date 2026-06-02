@@ -19,7 +19,7 @@ export function MobileNav() {
   const itemCount = useCartStore((s) => s.getItemCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden glass border-t border-border/50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden glass-nav border-t border-[var(--border-color)] mx-3 mb-3 rounded-[1.5rem] shadow-[var(--shadow-soft)] theme-surface">
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {
           const isActive =
@@ -35,13 +35,13 @@ export function MobileNav() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors min-w-[52px] relative",
-                isActive ? "text-brand-green" : "text-muted-foreground"
+                isActive ? "text-brand-pink" : "text-muted-foreground"
               )}
             >
               <item.icon className={cn("h-5 w-5", isActive && "scale-110")} />
               <span className="text-[10px] font-medium">{item.label}</span>
               {item.showBadge && itemCount > 0 && (
-                <span className="absolute top-0 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-green text-[9px] font-bold text-white">
+                <span className="absolute top-0 right-1 flex h-4 w-4 items-center justify-center rounded-full gradient-brand text-[9px] font-bold text-white shadow-sm">
                   {itemCount}
                 </span>
               )}

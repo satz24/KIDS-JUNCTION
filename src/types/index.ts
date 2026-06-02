@@ -1,12 +1,4 @@
-export type Category =
-  | "boys-wear"
-  | "girls-wear"
-  | "baby-collection"
-  | "educational-toys"
-  | "soft-toys"
-  | "remote-cars"
-  | "learning-kits"
-  | "school-accessories";
+export type Category = string;
 
 export interface Product {
   id: string;

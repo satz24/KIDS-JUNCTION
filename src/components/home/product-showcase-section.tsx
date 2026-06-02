@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { products } from "@/lib/data/products";
-import { categories } from "@/lib/data/categories";
+import { useSearchParams } from "next/navigation";
+import { useCategories, useProducts } from "@/hooks/use-catalog";
 import { ShowcaseCard } from "@/components/products/showcase-card";
 import { ProductInquiryModal } from "@/components/products/product-inquiry-modal";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
@@ -22,17 +22,28 @@ export function ProductShowcaseSection({
   showViewAll = true,
   showAll = false,
 }: ProductShowcaseSectionProps) {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const searchParams = useSearchParams();
+  const { categories } = useCategories();
+  const [activeCategory, setActiveCategory] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const { products: allProducts, loading } = useProducts({
+    categoryId: activeCategory === "all" ? undefined : activeCategory,
+    limit: showAll ? undefined : limit,
+  });
+
+  useEffect(() => {
+    const collectionParam = searchParams.get("collection");
+    if (collectionParam && categories.some((c) => c.id === collectionParam)) {
+      setActiveCategory(collectionParam);
+    }
+  }, [searchParams, categories]);
+
   const filtered = useMemo(() => {
-    const list =
-      activeCategory === "all"
-        ? products
-        : products.filter((p) => p.category === activeCategory);
-    return showAll ? list : list.slice(0, limit);
-  }, [activeCategory, limit, showAll]);
+    if (showAll) return allProducts;
+    return allProducts.slice(0, limit);
+  }, [allProducts, limit, showAll]);
 
   const handleSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -40,10 +51,10 @@ export function ProductShowcaseSection({
   };
 
   return (
-    <section id="collection" className="py-16 md:py-24 section-glow relative">
+    <section id="collection" className="py-16 md:py-24 section-bg-blue section-glow relative theme-surface">
       <div className="container mx-auto px-4 relative">
         <ScrollReveal className="text-center mb-10">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+          <h2 className="font-display heading-lg mb-3">
             Our <span className="text-brand-pink">Collection</span>
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
@@ -51,46 +62,54 @@ export function ProductShowcaseSection({
           </p>
         </ScrollReveal>
 
-        <ScrollReveal className="flex gap-2 overflow-x-auto no-scrollbar pb-6 justify-start md:justify-center">
+        <ScrollReveal className="flex gap-2 overflow-x-auto no-scrollbar pb-6 justify-start md:justify-center flex-wrap md:flex-nowrap">
           <button
+            type="button"
             onClick={() => setActiveCategory("all")}
             className={cn(
-              "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
-              activeCategory === "all"
-                ? "gradient-brand text-white shadow-md"
-                : "bg-muted hover:bg-muted/80"
+              "nav-tab shrink-0",
+              activeCategory === "all" ? "nav-tab-pink nav-tab-active" : "nav-tab-pink"
             )}
           >
             All
           </button>
-          {categories.map((cat) => (
+          {categories.map((category) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
+              key={category.id}
+              type="button"
+              onClick={() => setActiveCategory(category.id)}
               className={cn(
-                "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
-                activeCategory === cat.id
-                  ? "gradient-brand text-white shadow-md"
-                  : "bg-muted hover:bg-muted/80"
+                "nav-tab shrink-0 nav-tab-blue",
+                activeCategory === category.id && "nav-tab-active"
               )}
             >
-              {cat.name}
+              {category.name}
             </button>
           ))}
         </ScrollReveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filtered.map((product, i) => (
-            <ShowcaseCard
-              key={product.id}
-              product={product}
-              index={i}
-              onSelect={handleSelect}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <p className="text-center text-muted-foreground py-12">Loading products...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {filtered.map((product, i) => (
+              <ShowcaseCard
+                key={product.id}
+                product={product}
+                index={i}
+                onSelect={handleSelect}
+              />
+            ))}
+          </div>
+        )}
 
-        {showViewAll && !showAll && products.length > limit && (
+        {!loading && filtered.length === 0 && (
+          <p className="text-center text-muted-foreground py-12">
+            No products in this category yet. Contact us on WhatsApp for availability.
+          </p>
+        )}
+
+        {showViewAll && !showAll && allProducts.length > limit && (
           <div className="text-center mt-10">
             <Link href="/collection">
               <Button size="lg" variant="outline">

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Nunito, Emblema_One, Love_Ya_Like_A_Sister } from "next/font/google";
+import { Plus_Jakarta_Sans, Love_Ya_Like_A_Sister } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ClientProviders } from "@/components/providers/client-providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -12,21 +11,14 @@ import { StickyMobileCartBar } from "@/components/cart/sticky-mobile-cart-bar";
 import { AddToCartToast } from "@/components/shared/add-to-cart-toast";
 import { CursorGlow } from "@/components/shared/cursor-glow";
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
   display: "swap",
 });
 
 const loveYaLikeASister = Love_Ya_Like_A_Sister({
   variable: "--font-love-ya",
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const emblemaOne = Emblema_One({
-  variable: "--font-emblema-one",
   weight: "400",
   subsets: ["latin"],
   display: "swap",
@@ -59,23 +51,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
-        className={`${nunito.variable} ${emblemaOne.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
+        className={`${jakarta.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
       >
-        <ThemeProvider>
-          <ClientProviders>
-            <CursorGlow />
-            <Header />
-            <main className="flex-1 pb-20 md:pb-0">{children}</main>
-            <Footer />
-            <MobileNav />
-            <StickyMobileCartBar />
-            <FloatingCartButton />
-            <FloatingWhatsAppButton />
-            <AddToCartToast />
-          </ClientProviders>
-        </ThemeProvider>
+        <ClientProviders>
+          <CursorGlow />
+          <Header />
+          <main className="flex-1 pb-20 md:pb-0 theme-surface">{children}</main>
+          <Footer />
+          <MobileNav />
+          <StickyMobileCartBar />
+          <FloatingCartButton />
+          <FloatingWhatsAppButton />
+          <AddToCartToast />
+        </ClientProviders>
       </body>
     </html>
   );

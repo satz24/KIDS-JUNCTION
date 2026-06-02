@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Kids Junction logo placeholder">
+  <defs>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5FB7"/>
+      <stop offset="50%" stop-color="#62B6FF"/>
+      <stop offset="100%" stop-color="#59D98E"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="#FFF9FC" stroke="url(#ring)" stroke-width="4"/>
+  <text x="60" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#59D98E">K</text>
+  <text x="60" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#FF5FB7">J</text>
+  <text x="60" y="108" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#64748b">Replace logo.svg</text>
+</svg>

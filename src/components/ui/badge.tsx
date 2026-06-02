@@ -17,7 +17,7 @@ function Badge({
           "bg-secondary text-secondary-foreground": variant === "secondary",
           "bg-destructive text-destructive-foreground": variant === "destructive",
           "border border-border text-foreground": variant === "outline",
-          "bg-mint/20 text-emerald-700 dark:text-emerald-300": variant === "success",
+          "bg-mint/20 text-emerald-700": variant === "success",
         },
         className
       )}

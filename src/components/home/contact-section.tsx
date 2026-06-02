@@ -17,11 +17,10 @@ import { FacebookIcon, InstagramIcon } from "@/components/brand/social-icons";
 
 export function ContactSection() {
   return (
-    <section id="contact" className="py-16 md:py-24 relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-green/5 via-transparent to-brand-pink/5 pointer-events-none" />
+    <section id="contact" className="py-16 md:py-24 relative section-bg-pink section-glow theme-surface">
       <div className="container mx-auto px-4 relative">
         <ScrollReveal className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
+          <h2 className="font-display heading-lg mb-3">
             Visit <span className="text-brand-green">Us</span> Today
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
@@ -31,7 +30,7 @@ export function ContactSection() {
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <ScrollReveal>
-            <div className="rounded-3xl overflow-hidden border shadow-lg h-64 lg:h-full min-h-[280px]">
+            <div className="rounded-[1.75rem] overflow-hidden glass-card h-64 lg:h-full min-h-[280px] ring-2 ring-[var(--glass-border)]">
               <iframe
                 src={storeInfo.mapEmbed}
                 width="100%"
@@ -47,7 +46,7 @@ export function ContactSection() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <div className="rounded-3xl border bg-card p-6 md:p-8 shadow-lg space-y-6 h-full">
+            <div className="rounded-[1.75rem] glass-card p-6 md:p-8 space-y-6 h-full">
               <Logo size="md" />
 
               <div className="space-y-4">

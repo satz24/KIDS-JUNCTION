@@ -8,6 +8,8 @@ export function CursorGlow() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (window.matchMedia("(max-width: 768px)").matches) return;
+
     const handleMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
       setIsVisible(true);
@@ -29,16 +31,33 @@ export function CursorGlow() {
   }
 
   return (
-    <motion.div
-      className="pointer-events-none fixed z-[9999] hidden md:block"
-      animate={{
-        x: position.x - 200,
-        y: position.y - 200,
-        opacity: isVisible ? 0.15 : 0,
-      }}
-      transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
-    >
-      <div className="h-[400px] w-[400px] rounded-full bg-gradient-to-r from-brand-green/40 via-brand-pink/30 to-brand-green/40 blur-3xl" />
-    </motion.div>
+    <>
+      <motion.div
+        className="pointer-events-none fixed z-[9999] hidden md:block mix-blend-normal"
+        animate={{
+          x: position.x - 180,
+          y: position.y - 180,
+          opacity: isVisible ? 0.14 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 120, damping: 22, mass: 0.6 }}
+      >
+        <div
+          className="h-[360px] w-[360px] rounded-full blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255,107,203,0.35) 0%, rgba(106,190,255,0.25) 45%, rgba(107,255,175,0.2) 70%, transparent 75%)",
+          }}
+        />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none fixed z-[9998] hidden md:block h-3 w-3 rounded-full border border-brand-pink/40 bg-brand-pink/20"
+        animate={{
+          x: position.x - 6,
+          y: position.y - 6,
+          opacity: isVisible ? 0.8 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.2 }}
+      />
+    </>
   );
 }

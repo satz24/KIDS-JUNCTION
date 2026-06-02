@@ -1,10 +1,11 @@
 import { HeroSection } from "@/components/home/hero-section";
+import { CollectionsSection } from "@/components/home/collections-section";
 import { ProductShowcaseSection } from "@/components/home/product-showcase-section";
 import { AboutSection } from "@/components/home/about-section";
-import { GallerySection } from "@/components/home/gallery-section";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { ContactSection } from "@/components/home/contact-section";
 import { storeInfo } from "@/lib/data/store";
+import { Suspense } from "react";
 
 export default function HomePage() {
   const jsonLd = {
@@ -46,9 +47,11 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HeroSection />
-      <ProductShowcaseSection limit={8} />
+      <CollectionsSection />
+      <Suspense fallback={null}>
+        <ProductShowcaseSection limit={8} />
+      </Suspense>
       <AboutSection />
-      <GallerySection />
       <TestimonialsSection />
       <ContactSection />
     </>

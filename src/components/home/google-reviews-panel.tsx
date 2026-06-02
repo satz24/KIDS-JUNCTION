@@ -48,7 +48,7 @@ export function GoogleReviewsPanel({ variant = "full" }: GoogleReviewsPanelProps
         href={profileUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="group inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 px-4 py-2.5 text-sm shadow-sm transition-all hover:border-brand-green/40 hover:shadow-md"
+        className="group inline-flex items-center gap-2 rounded-2xl glass-card px-4 py-2.5 text-sm transition-all hover:border-brand-green/40 hover:shadow-md"
       >
         <GoogleLogo className="h-4 w-4 shrink-0" />
         <span className="font-semibold">
@@ -67,10 +67,10 @@ export function GoogleReviewsPanel({ variant = "full" }: GoogleReviewsPanelProps
   }
 
   return (
-    <div className="rounded-3xl border bg-card/80 p-6 md:p-8 shadow-lg">
+    <div className="rounded-3xl glass-panel p-6 md:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl glass shadow-sm">
             <GoogleLogo className="h-7 w-7" />
           </div>
           <div>
@@ -128,7 +128,7 @@ export function GoogleReviewsPanel({ variant = "full" }: GoogleReviewsPanelProps
               href={profileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl border bg-background/60 p-4 transition-all hover:border-brand-green/30 hover:shadow-md"
+              className="rounded-2xl glass-card p-4 transition-all hover:border-brand-green/30 hover:shadow-md"
             >
               <div className="flex items-start gap-3">
                 <Image

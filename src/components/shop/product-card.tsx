@@ -72,13 +72,13 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           {/* Wishlist */}
           <button
             onClick={handleWishlist}
-            className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+            className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full surface-badge backdrop-blur-sm shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
             aria-label="Add to wishlist"
           >
             <Heart
               className={cn(
                 "h-4 w-4 transition-colors",
-                inWishlist ? "fill-brand-pink text-brand-pink" : "text-gray-600"
+                inWishlist ? "fill-brand-pink text-brand-pink" : "text-muted-foreground"
               )}
             />
           </button>

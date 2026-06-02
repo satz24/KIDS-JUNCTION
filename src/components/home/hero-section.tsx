@@ -1,59 +1,48 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
   Shield,
   Shirt,
-  Sparkles,
-  MessageCircle,
+  Sparkles as SparklesIcon,
+  Heart,
+  Star,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FloatingElements } from "@/components/shared/floating-elements";
-import { LogoMark, BrandTitle } from "@/components/brand/logo";
-import { storeInfo } from "@/lib/data/store";
+import { cn } from "@/lib/utils";
 
 const trustBadges = [
-  { icon: Shirt, text: "Affordable Kids Fashion", color: "text-brand-green" },
-  { icon: Sparkles, text: "Premium Toys Collection", color: "text-brand-pink" },
-  { icon: Shield, text: "Best Quality for Kids", color: "text-brand-green" },
+  {
+    icon: Shirt,
+    text: "Affordable Kids Fashion",
+    accent: "nav-tab-blue" as const,
+    iconColor: "text-brand-blue",
+  },
+  {
+    icon: SparklesIcon,
+    text: "Premium Toys Collection",
+    accent: "nav-tab-pink" as const,
+    iconColor: "text-brand-pink",
+  },
+  {
+    icon: Shield,
+    text: "Best Quality for Kids",
+    accent: "nav-tab-green" as const,
+    iconColor: "text-brand-green",
+  },
 ];
 
 export function HeroSection() {
   return (
-    <section id="home" className="relative overflow-hidden gradient-hero min-h-[92vh] flex items-center">
-      <FloatingElements dense />
-
+    <section id="home" className="relative overflow-hidden gradient-hero min-h-[92vh] flex items-center theme-surface">
       <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6 text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-semibold">
-                <span className="text-brand-green italic">{storeInfo.tagline}</span>
-              </span>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.05 }}
-              className="space-y-4 flex flex-col items-center lg:items-start"
-            >
-              <LogoMark className="h-16 w-16 text-2xl rounded-2xl shadow-xl animate-wiggle" />
-              <BrandTitle size="lg" className="text-center lg:text-left" />
-            </motion.div>
-
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-center">
+          <div className="space-y-6 text-center lg:text-left min-w-0 relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-3xl sm:text-4xl md:text-5xl leading-[1.12]"
+              transition={{ duration: 0.6 }}
+              className="font-display heading-xl"
             >
               Where Little{" "}
               <span className="text-gradient-brand">Dreams</span> Come Alive
@@ -63,51 +52,30 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 leading-relaxed"
+              className="text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium"
             >
               Discover premium kids clothing & toys at Kids Junction. Add to cart and
               place your order instantly via WhatsApp — simple, fast, and personal.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
-            >
-              <Link href="#collection">
-                <Button size="xl" variant="gradient" className="w-full sm:w-auto">
-                  Shop Now
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/collection">
-                <Button size="xl" variant="outline" className="w-full sm:w-auto glass">
-                  Explore Collection
-                </Button>
-              </Link>
-              <a href={storeInfo.whatsappLink} target="_blank" rel="noopener noreferrer">
-                <Button size="xl" variant="outline" className="w-full sm:w-auto border-brand-green/30">
-                  <MessageCircle className="h-5 w-5 text-brand-green" />
-                  Contact WhatsApp
-                </Button>
-              </a>
-            </motion.div>
-
-            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex flex-wrap items-center gap-3 justify-center lg:justify-start pt-2"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap items-center gap-2.5 justify-center lg:justify-start pt-1 max-w-lg mx-auto lg:mx-0"
             >
-              {trustBadges.map(({ icon: Icon, text, color }) => (
-                <div
+              {trustBadges.map(({ icon: Icon, text, accent, iconColor }, i) => (
+                <motion.div
                   key={text}
-                  className="flex items-center gap-2 text-sm glass rounded-xl px-3 py-2"
+                  whileHover={{ y: -3 }}
+                  className={cn("hero-trust-tag nav-tab", accent)}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 + i * 0.08 }}
                 >
-                  <Icon className={`h-4 w-4 ${color}`} />
-                  <span className="text-muted-foreground">{text}</span>
-                </div>
+                  <Icon className={cn("h-3.5 w-3.5 shrink-0", iconColor)} strokeWidth={2.5} />
+                  <span>{text}</span>
+                </motion.div>
               ))}
             </motion.div>
           </div>
@@ -116,51 +84,43 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative hidden lg:block"
+            className="relative hidden lg:block min-w-0 pl-4 xl:pl-8"
           >
-            <div className="relative w-full aspect-square max-w-lg mx-auto">
-              <div className="absolute inset-0 rounded-[3rem] gradient-brand opacity-20 blur-3xl animate-pulse-soft" />
+            <div className="relative w-full aspect-square max-w-md xl:max-w-lg mx-auto group">
+              <motion.div
+                animate={{ y: [0, -14, 0], rotate: [0, 1, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-4 right-0 xl:-right-2 z-20 glass-card rounded-2xl px-4 py-3 flex items-center gap-2"
+              >
+                <Heart className="h-4 w-4 text-brand-pink fill-brand-pink/30" />
+                <span className="text-xs font-bold text-brand-pink">Parent Trusted</span>
+              </motion.div>
+
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                className="absolute -bottom-2 left-0 xl:-left-4 z-20 glass-card rounded-2xl px-4 py-3 flex items-center gap-2"
+              >
+                <Star className="h-4 w-4 text-brand-blue fill-brand-blue/30" />
+                <span className="text-xs font-bold text-brand-blue">Premium Quality</span>
+              </motion.div>
+
               <motion.div
                 animate={{ y: [0, -18, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl ring-4 ring-white/40"
+                className="relative z-10 hero-frame rounded-[2.75rem] p-3 group-hover:shadow-[0_30px_70px_rgba(255,95,183,0.2)] transition-shadow duration-500"
               >
-                <Image
-                  src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=800&fit=crop"
-                  alt="Kids Junction store showcase"
-                  width={600}
-                  height={600}
-                  className="object-cover"
-                  priority
-                />
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute -left-8 top-1/4 z-20 glass rounded-2xl p-3 shadow-xl"
-              >
-                <Image
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop"
-                  alt="Toys"
-                  width={72}
-                  height={72}
-                  className="rounded-xl"
-                />
-                <p className="text-xs font-bold mt-2 text-brand-pink">Soft Toys</p>
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                className="absolute -right-6 bottom-1/4 z-20 glass rounded-2xl p-3 shadow-xl"
-              >
-                <Image
-                  src="https://images.unsplash.com/photo-1515488042361-ee00e017ddd1?w=200&h=200&fit=crop"
-                  alt="Kids wear"
-                  width={72}
-                  height={72}
-                  className="rounded-xl"
-                />
-                <p className="text-xs font-bold mt-2 text-brand-green">Kids Wear</p>
+                <div className="relative overflow-hidden rounded-[2.25rem]">
+                  <Image
+                    src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=800&fit=crop"
+                    alt="Kids Junction store showcase"
+                    width={600}
+                    height={600}
+                    className="object-cover product-image-zoom"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-pink/10 via-transparent to-brand-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
               </motion.div>
             </div>
           </motion.div>

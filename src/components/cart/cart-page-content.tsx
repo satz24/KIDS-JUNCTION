@@ -49,11 +49,33 @@ export function CartPageContent() {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     const validationErrors = validateOrderForm(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
+    }
+    const fullAddress = [form.address, form.landmark, form.pincode].filter(Boolean).join(", ");
+    try {
+      const { createOrder, isSupabaseConfigured } = await import("@/lib/supabase/queries");
+      if (isSupabaseConfigured) {
+        await createOrder({
+          customerName: form.fullName,
+          phone: form.phone,
+          address: fullAddress,
+          cartData: items.map((item) => ({
+            productId: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            size: item.selectedSize,
+            color: item.selectedColor,
+          })),
+          totalAmount: subtotal,
+        });
+      }
+    } catch {
+      // WhatsApp flow continues even if order save fails
     }
     openWhatsAppOrder(items, form, subtotal);
     clearCart();
@@ -63,7 +85,8 @@ export function CartPageContent() {
 
   if (items.length === 0 && step === "cart") {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
+      <div className="section-bg-green theme-surface min-h-[60vh]">
+        <div className="container mx-auto px-4 py-20 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,11 +105,13 @@ export function CartPageContent() {
             </Button>
           </Link>
         </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
+    <div className="section-bg-green theme-surface min-h-[60vh]">
     <div className="container mx-auto px-4 py-8 md:py-12 pb-32">
       <ScrollReveal className="mb-8">
         <h1 className="font-display text-3xl md:text-4xl font-bold">
@@ -138,7 +163,7 @@ export function CartPageContent() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="flex gap-4 p-4 rounded-2xl border bg-card shadow-sm"
+                    className="flex gap-4 p-4 rounded-2xl glass-card"
                   >
                     <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden bg-muted">
                       <Image
@@ -227,7 +252,7 @@ export function CartPageContent() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="rounded-2xl border bg-card p-6 md:p-8 space-y-5"
+                className="rounded-2xl glass-card p-6 md:p-8 space-y-5"
               >
                 <h2 className="font-display font-bold text-lg">Customer Details</h2>
 
@@ -319,7 +344,7 @@ export function CartPageContent() {
 
         {/* Order summary */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 rounded-2xl border bg-card p-6 shadow-lg space-y-4">
+          <div className="sticky top-24 rounded-2xl glass-panel p-6 space-y-4">
             <h2 className="font-display font-bold text-lg">Order Summary</h2>
 
             <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -371,6 +396,7 @@ export function CartPageContent() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
