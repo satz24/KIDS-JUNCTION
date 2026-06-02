@@ -3,10 +3,16 @@ import type { NextConfig } from "next";
 const isGithubPages = process.env.GITHUB_PAGES === "true";
 const basePath = isGithubPages ? "/KIDS-JUNCTION" : "";
 
-function getSupabaseImagePatterns(): NonNullable<
-  NextConfig["images"]
->["remotePatterns"] {
-  const patterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
+type ImageRemotePattern = {
+  protocol: "http" | "https";
+  hostname: string;
+  pathname?: string;
+  port?: string;
+  search?: string;
+};
+
+function getSupabaseImagePatterns(): ImageRemotePattern[] {
+  const patterns: ImageRemotePattern[] = [
     {
       protocol: "https",
       hostname: "**.supabase.co",
