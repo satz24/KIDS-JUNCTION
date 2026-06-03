@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import { isAdminLoginPath } from "@/lib/admin-path";
 import type { User } from "@supabase/supabase-js";
 
 export function useAdminAuth() {
@@ -33,17 +32,13 @@ export function useAdminAuth() {
 
 export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { user, loading, isConfigured } = useAdminAuth();
 
   useEffect(() => {
     if (loading) return;
-    if (isAdminLoginPath(pathname)) return;
     if (!isConfigured) return;
     if (!user) router.replace("/admin/login");
-  }, [user, loading, isConfigured, pathname, router]);
-
-  if (isAdminLoginPath(pathname)) return <>{children}</>;
+  }, [user, loading, isConfigured, router]);
 
   if (!isConfigured) {
     return (

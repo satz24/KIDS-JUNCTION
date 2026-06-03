@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Love_Ya_Like_A_Sister } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/components/providers/client-providers";
-import { StoreShell } from "@/components/layout/store-shell";
 import { AddToCartToast } from "@/components/shared/add-to-cart-toast";
 import { CursorGlow } from "@/components/shared/cursor-glow";
 
@@ -52,7 +51,7 @@ export default function RootLayout({
       >
         <ClientProviders>
           <CursorGlow />
-          <StoreShell>{children}</StoreShell>
+          {children}
           <AddToCartToast />
         </ClientProviders>
       </body>
