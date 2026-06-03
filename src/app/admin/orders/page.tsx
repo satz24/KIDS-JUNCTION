@@ -83,7 +83,7 @@ export default function AdminOrdersPage() {
         <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">
           {error}
           {error.toLowerCase().includes("permission denied") && (
-            <> — Add <code>SUPABASE_SERVICE_ROLE_KEY</code> to .env or re-run <code>supabase/setup.sql</code> in Supabase.</>
+            <> — Re-run <code>supabase/setup.sql</code> in Supabase SQL Editor.</>
           )}
         </p>
       )}

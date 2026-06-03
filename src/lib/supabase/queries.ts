@@ -160,23 +160,6 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
 
 export async function deleteOrder(id: string): Promise<void> {
   if (!supabase) throw new Error("Supabase not configured");
-
-  const { data: sessionData } = await supabase.auth.getSession();
-  const token = sessionData.session?.access_token;
-
-  if (token) {
-    const res = await fetch(`/api/admin/orders/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) return;
-
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    if (res.status !== 503) {
-      throw new Error(body.error ?? "Failed to delete order");
-    }
-  }
-
   const { error } = await supabase.from("orders").delete().eq("id", id);
   if (error) throwQueryError(error);
 }
