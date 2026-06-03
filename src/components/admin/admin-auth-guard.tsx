@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { isAdminLoginPath } from "@/lib/admin-path";
 import type { User } from "@supabase/supabase-js";
 
 export function useAdminAuth() {
@@ -37,12 +38,12 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (loading) return;
-    if (pathname === "/admin/login") return;
+    if (isAdminLoginPath(pathname)) return;
     if (!isConfigured) return;
     if (!user) router.replace("/admin/login");
   }, [user, loading, isConfigured, pathname, router]);
 
-  if (pathname === "/admin/login") return <>{children}</>;
+  if (isAdminLoginPath(pathname)) return <>{children}</>;
 
   if (!isConfigured) {
     return (
@@ -57,13 +58,19 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
+      <div className="flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground animate-pulse">Checking admin session...</p>
       </div>
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground animate-pulse">Redirecting to login...</p>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingBag, Star, Tag, Minus, Plus } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getCategoryName } from "@/lib/data/categories";
@@ -88,7 +88,7 @@ export function ProductInquiryModal({
               <Badge variant="secondary" className="mb-2">
                 {getCategoryName(product.category)}
               </Badge>
-              <h2 className="font-display text-2xl font-bold">{product.name}</h2>
+              <DialogTitle className="font-display text-2xl font-bold">{product.name}</DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">{product.brand}</p>
             </div>
 

@@ -1,7 +1,6 @@
 import { HeroSection } from "@/components/home/hero-section";
 import { ProductShowcaseSection } from "@/components/home/product-showcase-section";
 import { AboutSection } from "@/components/home/about-section";
-import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { ContactSection } from "@/components/home/contact-section";
 import { storeInfo } from "@/lib/data/store";
 import { Suspense } from "react";
@@ -50,7 +49,6 @@ export default function HomePage() {
         <ProductShowcaseSection limit={8} />
       </Suspense>
       <AboutSection />
-      <TestimonialsSection />
       <ContactSection />
     </>
   );

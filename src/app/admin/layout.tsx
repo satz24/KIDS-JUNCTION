@@ -3,12 +3,12 @@
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminAuthGuard } from "@/components/admin/admin-auth-guard";
 import { usePathname } from "next/navigation";
+import { isAdminLoginPath } from "@/lib/admin-path";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLogin = pathname === "/admin/login";
 
-  if (isLogin) {
+  if (isAdminLoginPath(pathname)) {
     return <>{children}</>;
   }
 

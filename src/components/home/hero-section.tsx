@@ -10,6 +10,7 @@ import {
   Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { STORE_FRONT_ALT, STORE_FRONT_SRC } from "@/lib/brand/logo-asset";
 
 const trustBadges = [
   {
@@ -35,6 +36,18 @@ const trustBadges = [
 export function HeroSection() {
   return (
     <section id="home" className="relative overflow-hidden gradient-hero min-h-[92vh] flex items-center theme-surface">
+      <div className="hero-store-bg" aria-hidden>
+        <Image
+          src={STORE_FRONT_SRC}
+          alt=""
+          fill
+          sizes="100vw"
+          className="hero-store-bg__photo"
+          priority
+        />
+        <div className="hero-store-bg__wash" />
+      </div>
+
       <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-center">
           <div className="space-y-6 text-center lg:text-left min-w-0 relative z-10">
@@ -86,7 +99,7 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative hidden lg:block min-w-0 pl-4 xl:pl-8"
           >
-            <div className="relative w-full aspect-square max-w-md xl:max-w-lg mx-auto group">
+            <div className="relative w-full aspect-[4/3] max-w-md xl:max-w-lg mx-auto group">
               <motion.div
                 animate={{ y: [0, -14, 0], rotate: [0, 1, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -110,16 +123,20 @@ export function HeroSection() {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 className="relative z-10 hero-frame rounded-[2.75rem] p-3 group-hover:shadow-[0_30px_70px_rgba(255,95,183,0.2)] transition-shadow duration-500"
               >
-                <div className="relative overflow-hidden rounded-[2.25rem]">
+                <div className="relative overflow-hidden rounded-[2.25rem] aspect-[4/3]">
                   <Image
-                    src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=800&fit=crop"
-                    alt="Kids Junction store showcase"
-                    width={600}
-                    height={600}
-                    className="object-cover product-image-zoom"
+                    src={STORE_FRONT_SRC}
+                    alt={STORE_FRONT_ALT}
+                    fill
+                    sizes="(max-width: 1280px) 420px, 520px"
+                    className="object-cover object-[center_38%] product-image-zoom"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-pink/10 via-transparent to-brand-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-pink/15 via-transparent to-brand-blue/10 opacity-80" />
+                  <div className="absolute inset-x-0 bottom-0 px-5 py-4 bg-gradient-to-t from-black/35 to-transparent">
+                    <p className="text-white text-sm font-bold drop-shadow-sm">Visit us on G.S.T. Road</p>
+                    <p className="text-white/90 text-xs">Guduvanchery&apos;s No.1 baby shop</p>
+                  </div>
                 </div>
               </motion.div>
             </div>

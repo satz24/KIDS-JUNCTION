@@ -38,8 +38,9 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center px-4 theme-surface">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
         className="w-full max-w-md glass-panel rounded-[2rem] p-8 md:p-10"
       >
         <div className="flex justify-center mb-8">
