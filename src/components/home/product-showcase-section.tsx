@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useCategories, useProducts } from "@/hooks/use-catalog";
 import { ShowcaseCard } from "@/components/products/showcase-card";
 import { ProductInquiryModal } from "@/components/products/product-inquiry-modal";
+import { PriceSortSelect } from "@/components/products/price-sort-select";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { Button } from "@/components/ui/button";
+import { sortProductsByPrice, type PriceSort } from "@/lib/products/sort-products";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -25,25 +27,28 @@ export function ProductShowcaseSection({
   const searchParams = useSearchParams();
   const { categories } = useCategories();
   const [activeCategory, setActiveCategory] = useState("all");
+  const [sort, setSort] = useState<PriceSort>("default");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const { products: allProducts, loading } = useProducts({
     categoryId: activeCategory === "all" ? undefined : activeCategory,
-    limit: showAll ? undefined : limit,
   });
 
   useEffect(() => {
     const collectionParam = searchParams.get("collection");
-    if (collectionParam && categories.some((c) => c.id === collectionParam)) {
-      setActiveCategory(collectionParam);
-    }
+    if (!collectionParam) return;
+    if (!categories.some((c) => c.id === collectionParam)) return;
+    setActiveCategory((current) =>
+      current === collectionParam ? current : collectionParam
+    );
   }, [searchParams, categories]);
 
-  const filtered = useMemo(() => {
-    if (showAll) return allProducts;
-    return allProducts.slice(0, limit);
-  }, [allProducts, limit, showAll]);
+  const sortedProducts = useMemo(() => {
+    const sorted = sortProductsByPrice(allProducts, sort);
+    if (showAll) return sorted;
+    return sorted.slice(0, limit);
+  }, [allProducts, sort, limit, showAll]);
 
   const handleSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -53,7 +58,7 @@ export function ProductShowcaseSection({
   return (
     <section id="collection" className="py-16 md:py-24 section-bg-blue section-glow relative theme-surface">
       <div className="container mx-auto px-4 relative">
-        <ScrollReveal className="text-center mb-10">
+        <ScrollReveal className="text-center mb-8">
           <h2 className="font-display heading-lg mb-3">
             Our <span className="text-brand-pink">Collection</span>
           </h2>
@@ -62,37 +67,40 @@ export function ProductShowcaseSection({
           </p>
         </ScrollReveal>
 
-        <ScrollReveal className="flex gap-2 overflow-x-auto no-scrollbar pb-6 justify-start md:justify-center flex-wrap md:flex-nowrap">
-          <button
-            type="button"
-            onClick={() => setActiveCategory("all")}
-            className={cn(
-              "nav-tab shrink-0",
-              activeCategory === "all" ? "nav-tab-pink nav-tab-active" : "nav-tab-pink"
-            )}
-          >
-            All
-          </button>
-          {categories.map((category) => (
+        <ScrollReveal className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0 pb-1">
             <button
-              key={category.id}
               type="button"
-              onClick={() => setActiveCategory(category.id)}
+              onClick={() => setActiveCategory("all")}
               className={cn(
-                "nav-tab shrink-0 nav-tab-blue",
-                activeCategory === category.id && "nav-tab-active"
+                "nav-tab shrink-0 text-xs sm:text-sm",
+                activeCategory === "all" ? "nav-tab-pink nav-tab-active" : "nav-tab-pink"
               )}
             >
-              {category.name}
+              All
             </button>
-          ))}
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setActiveCategory(category.id)}
+                className={cn(
+                  "nav-tab shrink-0 nav-tab-blue text-xs sm:text-sm",
+                  activeCategory === category.id && "nav-tab-active"
+                )}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+          <PriceSortSelect sort={sort} onSortChange={setSort} />
         </ScrollReveal>
 
         {loading ? (
           <p className="text-center text-muted-foreground py-12">Loading products...</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5 justify-items-center">
-            {filtered.map((product, i) => (
+            {sortedProducts.map((product, i) => (
               <ShowcaseCard
                 key={product.id}
                 product={product}
@@ -103,7 +111,7 @@ export function ProductShowcaseSection({
           </div>
         )}
 
-        {!loading && filtered.length === 0 && (
+        {!loading && sortedProducts.length === 0 && (
           <p className="text-center text-muted-foreground py-12">
             No products in this category yet. Contact us on WhatsApp for availability.
           </p>

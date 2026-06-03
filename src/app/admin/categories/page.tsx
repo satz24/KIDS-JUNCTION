@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import {
   countProductsInCategory,
@@ -11,9 +10,12 @@ import {
   getErrorMessage,
   slugify,
   upsertCategory,
+  uploadCategoryImage,
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
 import type { DbCategory } from "@/types/database";
+import { AdminImageUpload } from "@/components/admin/admin-image-upload";
+import { CategoryCircleImage } from "@/components/products/category-circle-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +26,8 @@ export default function AdminCategoriesPage() {
   const [productCounts, setProductCounts] = useState<Record<string, number>>({});
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DbCategory | null>(null);
-  const [form, setForm] = useState({ id: "", name: "", image_url: "/brand/KJ_final.jpg" });
+  const [form, setForm] = useState({ id: "", name: "", image_url: "" });
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -46,9 +49,22 @@ export default function AdminCategoriesPage() {
   }, []);
 
   const resetForm = () => {
-    setForm({ id: "", name: "", image_url: "/brand/KJ_final.jpg" });
+    setForm({ id: "", name: "", image_url: "" });
     setEditing(null);
     setShowForm(false);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const url = await uploadCategoryImage(file);
+      setForm((f) => ({ ...f, image_url: url }));
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +72,11 @@ export default function AdminCategoriesPage() {
     if (!isSupabaseConfigured) return;
     try {
       const id = editing?.id ?? slugify(form.name);
-      await upsertCategory({ id, name: form.name, image_url: form.image_url });
+      await upsertCategory({
+        id,
+        name: form.name,
+        image_url: form.image_url || "/brand/KJ_final.jpg",
+      });
       await load();
       resetForm();
     } catch (err) {
@@ -66,7 +86,11 @@ export default function AdminCategoriesPage() {
 
   const handleEdit = (cat: DbCategory) => {
     setEditing(cat);
-    setForm({ id: cat.id, name: cat.name, image_url: cat.image_url ?? "/brand/KJ_final.jpg" });
+    setForm({
+      id: cat.id,
+      name: cat.name,
+      image_url: cat.image_url ?? "",
+    });
     setShowForm(true);
   };
 
@@ -121,15 +145,28 @@ export default function AdminCategoriesPage() {
             <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
               <div className="space-y-2">
                 <Label>Name</Label>
-                <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="surface-input" />
+                <Input
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="surface-input"
+                  placeholder="e.g. Baby Cycles"
+                />
               </div>
-              <div className="space-y-2">
-                <Label>Image URL</Label>
-                <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className="surface-input" />
-              </div>
+              <AdminImageUpload
+                label="Category Photo"
+                value={form.image_url}
+                uploading={uploading}
+                onUpload={handleImageUpload}
+                previewRounded="full"
+              />
               <div className="flex gap-2">
-                <Button type="submit" variant="gradient">Save</Button>
-                <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
+                <Button type="submit" variant="gradient" disabled={uploading}>
+                  Save
+                </Button>
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  Cancel
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -142,7 +179,12 @@ export default function AdminCategoriesPage() {
           return (
             <Card key={cat.id} className="glass-card border-0">
               <CardContent className="p-4 flex items-center gap-3">
-                <Image src={cat.image_url ?? "/brand/KJ_final.jpg"} alt={cat.name} width={56} height={56} className="rounded-full object-contain bg-white p-1" unoptimized />
+                <CategoryCircleImage
+                  src={cat.image_url}
+                  alt={cat.name}
+                  size="sm"
+                  contain={!cat.image_url?.startsWith("http")}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold truncate">{cat.name}</p>
                   <p className="text-xs text-muted-foreground">{cat.id}</p>
@@ -150,7 +192,9 @@ export default function AdminCategoriesPage() {
                     {count} product{count === 1 ? "" : "s"}
                   </p>
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => handleEdit(cat)}><Pencil className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => handleEdit(cat)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
                 <Button
                   size="icon"
                   variant="ghost"

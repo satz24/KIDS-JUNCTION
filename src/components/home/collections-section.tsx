@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useCategories } from "@/hooks/use-catalog";
+import { CategoryCircleImage } from "@/components/products/category-circle-image";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { resolveImageSrc } from "@/lib/brand/logo-asset";
 import { cn } from "@/lib/utils";
 
 export function CollectionsSection() {
@@ -49,25 +48,17 @@ export function CollectionsSection() {
                     whileHover={{ y: -4 }}
                     className="flex flex-col items-center w-[5.5rem] sm:w-[6.5rem] md:w-[7.5rem]"
                   >
-                    <div
+                    <CategoryCircleImage
+                      src={collection.image_url}
+                      alt={collection.name}
+                      size="lg"
                       className={cn(
-                        "relative h-[5.5rem] w-[5.5rem] sm:h-[6.5rem] sm:w-[6.5rem] md:h-[7.5rem] md:w-[7.5rem]",
-                        "rounded-full bg-white flex items-center justify-center overflow-hidden p-1.5",
-                        "ring-2 ring-[var(--glass-border)] group-hover:ring-brand-pink/30",
+                        "group-hover:ring-brand-pink/30",
                         "shadow-[0_8px_24px_rgba(255,95,183,0.12)] group-hover:shadow-[0_16px_40px_rgba(98,182,255,0.18)]",
                         "transition-all duration-300 group-hover:-translate-y-1"
                       )}
-                    >
-                      <Image
-                        src={resolveImageSrc(collection.image_url)}
-                        alt={collection.name}
-                        width={120}
-                        height={120}
-                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                        loading="lazy"
-                        unoptimized
-                      />
-                    </div>
+                      contain={!collection.image_url?.startsWith("http")}
+                    />
                     <p className="mt-3 text-center text-xs sm:text-sm font-bold text-brand-pink leading-tight max-w-[6.5rem] group-hover:text-brand-pink-dark transition-colors">
                       {collection.name}
                     </p>

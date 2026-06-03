@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MessageCircle,
   ShoppingBag,
   Search,
   Home,
@@ -209,16 +208,6 @@ export function Header() {
                     </motion.span>
                   )}
                 </Link>
-
-                <a
-                  href={storeInfo.whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden sm:inline-flex nav-whatsapp-bubble"
-                >
-                  <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={2.5} />
-                  WhatsApp
-                </a>
               </div>
             </div>
           </div>

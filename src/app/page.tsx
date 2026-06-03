@@ -1,5 +1,4 @@
 import { HeroSection } from "@/components/home/hero-section";
-import { CollectionsSection } from "@/components/home/collections-section";
 import { ProductShowcaseSection } from "@/components/home/product-showcase-section";
 import { AboutSection } from "@/components/home/about-section";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
@@ -47,7 +46,6 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HeroSection />
-      <CollectionsSection />
       <Suspense fallback={null}>
         <ProductShowcaseSection limit={8} />
       </Suspense>

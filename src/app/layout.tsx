@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Love_Ya_Like_A_Sister } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/components/providers/client-providers";
 import { Header } from "@/components/layout/header";
+import { CategoryStrip } from "@/components/layout/category-strip";
 import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { FloatingWhatsAppButton } from "@/components/layout/floating-whatsapp-button";
@@ -58,6 +59,7 @@ export default function RootLayout({
         <ClientProviders>
           <CursorGlow />
           <Header />
+          <CategoryStrip />
           <main className="flex-1 pb-20 md:pb-0 theme-surface">{children}</main>
           <Footer />
           <MobileNav />

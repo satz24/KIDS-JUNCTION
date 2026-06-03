@@ -158,6 +158,29 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
   if (error) throwQueryError(error);
 }
 
+export async function deleteOrder(id: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase not configured");
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+
+  if (token) {
+    const res = await fetch(`/api/admin/orders/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) return;
+
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    if (res.status !== 503) {
+      throw new Error(body.error ?? "Failed to delete order");
+    }
+  }
+
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+  if (error) throwQueryError(error);
+}
+
 export async function upsertCategory(category: {
   id: string;
   name: string;
@@ -230,17 +253,27 @@ export async function deleteProduct(id: string): Promise<void> {
   if (error) throwQueryError(error);
 }
 
-export async function uploadProductImage(file: File): Promise<string> {
+export async function uploadAdminImage(file: File, folder = "images"): Promise<string> {
   if (!supabase) throw new Error("Supabase not configured");
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `${Date.now()}-${slugify(file.name.replace(`.${ext}`, ""))}.${ext}`;
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+  const safeName = slugify(file.name.replace(new RegExp(`\\.${ext}$`, "i"), "")) || "image";
+  const path = `${folder}/${Date.now()}-${safeName}.${ext}`;
   const { error } = await supabase.storage.from("product-images").upload(path, file, {
     cacheControl: "3600",
     upsert: false,
+    contentType: file.type || undefined,
   });
   if (error) throwQueryError(error);
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
   return data.publicUrl;
+}
+
+export async function uploadProductImage(file: File): Promise<string> {
+  return uploadAdminImage(file, "products");
+}
+
+export async function uploadCategoryImage(file: File): Promise<string> {
+  return uploadAdminImage(file, "categories");
 }
 
 export async function getDashboardStats() {

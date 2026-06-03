@@ -1,7 +1,8 @@
 -- =============================================================================
 -- Kids Junction — Complete Supabase Setup (SINGLE FILE — run this only)
 -- =============================================================================
--- Includes: tables, indexes, storage bucket, RLS policies, table grants, seed data
+-- Includes: tables, indexes, storage bucket, RLS policies, table grants, seed data,
+--           admin order delete (policy + grant)
 --
 -- How to use:
 --   1. Open Supabase → SQL Editor → New query
@@ -82,6 +83,7 @@ drop policy if exists "products_admin_write" on public.products;
 drop policy if exists "orders_public_insert" on public.orders;
 drop policy if exists "orders_admin_read" on public.orders;
 drop policy if exists "orders_admin_update" on public.orders;
+drop policy if exists "orders_admin_delete" on public.orders;
 drop policy if exists "product_images_public_read" on storage.objects;
 drop policy if exists "product_images_admin_upload" on storage.objects;
 drop policy if exists "product_images_admin_update" on storage.objects;
@@ -111,7 +113,7 @@ create policy "products_admin_write"
   using (true)
   with check (true);
 
--- Orders: customers insert via website; admins read & update
+-- Orders: customers insert via website; admins read, update & delete
 create policy "orders_public_insert"
   on public.orders for insert
   to anon, authenticated
@@ -127,6 +129,11 @@ create policy "orders_admin_update"
   to authenticated
   using (true)
   with check (true);
+
+create policy "orders_admin_delete"
+  on public.orders for delete
+  to authenticated
+  using (true);
 
 -- Storage: public read, admin upload/update/delete
 create policy "product_images_public_read"
@@ -162,7 +169,7 @@ grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 
 grant insert on public.orders to anon, authenticated;
-grant select, update on public.orders to authenticated;
+grant select, update, delete on public.orders to authenticated;
 
 grant select on storage.objects to anon, authenticated;
 grant insert, update, delete on storage.objects to authenticated;

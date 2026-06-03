@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Plus, Pencil, Trash2, Search, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import {
   deleteProduct,
   fetchCategories,
@@ -13,6 +13,8 @@ import {
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
 import type { DbCategory, DbProduct } from "@/types/database";
+import { AdminImageUpload } from "@/components/admin/admin-image-upload";
+import { CategoryCircleImage } from "@/components/products/category-circle-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -119,15 +121,14 @@ export default function AdminProductsPage() {
     setShowForm(false);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (file: File) => {
     setUploading(true);
+    setError(null);
     try {
       const url = await uploadProductImage(file);
       setForm((f) => ({ ...f, image_url: url }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed");
+      setError(getErrorMessage(err));
     } finally {
       setUploading(false);
     }
@@ -235,25 +236,20 @@ export default function AdminProductsPage() {
                 <Label>Description</Label>
                 <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="surface-input" />
               </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Product Image</Label>
-                <div className="flex items-center gap-3">
-                  <label className="hero-cta hero-cta-explore cursor-pointer inline-flex items-center gap-2 px-4 py-2">
-                    <Upload className="h-4 w-4" />
-                    {uploading ? "Uploading..." : "Upload Image"}
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                  </label>
-                  {form.image_url && (
-                    <Image src={form.image_url} alt="Preview" width={48} height={48} className="rounded-lg object-cover" unoptimized />
-                  )}
-                </div>
-              </div>
+              <AdminImageUpload
+                label="Product Photo"
+                value={form.image_url}
+                uploading={uploading}
+                onUpload={handleImageUpload}
+              />
               <label className="flex items-center gap-2 sm:col-span-2 text-sm font-semibold">
                 <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
                 Featured product
               </label>
               <div className="flex gap-2 sm:col-span-2">
-                <Button type="submit" variant="gradient">{editing ? "Update" : "Create"}</Button>
+                <Button type="submit" variant="gradient" disabled={uploading}>
+                  {editing ? "Update" : "Create"}
+                </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
               </div>
             </form>
@@ -266,13 +262,11 @@ export default function AdminProductsPage() {
           <section key={category.id} className="space-y-3">
             <div className="flex items-center justify-between gap-3 border-b border-[var(--glass-border)] pb-3">
               <div className="flex items-center gap-3 min-w-0">
-                <Image
-                  src={category.image_url ?? "/brand/KJ_final.jpg"}
+                <CategoryCircleImage
+                  src={category.image_url}
                   alt={category.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-contain bg-white p-1 shrink-0"
-                  unoptimized
+                  size="sm"
+                  contain={!category.image_url?.startsWith("http")}
                 />
                 <div className="min-w-0">
                   <h2 className="font-display text-xl font-bold truncate">{category.name}</h2>

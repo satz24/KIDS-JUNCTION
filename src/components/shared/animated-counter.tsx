@@ -38,9 +38,10 @@ export function AnimatedCounter({
       { threshold: 0.5 }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    const node = ref.current;
+    if (node) observer.observe(node);
     return () => observer.disconnect();
-  }, [value, spring, hasAnimated]);
+  }, [value, hasAnimated, spring]);
 
   return (
     <motion.span ref={ref} className={className}>
