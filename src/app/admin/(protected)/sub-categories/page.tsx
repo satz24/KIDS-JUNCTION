@@ -40,7 +40,12 @@ export default function AdminSubCategoriesPage() {
       setProductCounts(counts);
       setError(null);
     } catch (err) {
-      setError(getErrorMessage(err));
+      const message = getErrorMessage(err);
+      setError(
+        message.includes("sub_category")
+          ? `${message} — Run the full supabase/setup.sql file in Supabase SQL Editor.`
+          : message
+      );
       setCategories([]);
       setSubCategories([]);
       setProductCounts({});
@@ -100,7 +105,12 @@ export default function AdminSubCategoriesPage() {
       await load();
       resetForm();
     } catch (err) {
-      setError(getErrorMessage(err));
+      const message = getErrorMessage(err);
+      setError(
+        message.includes("sub_category")
+          ? `${message} — Run the full supabase/setup.sql file in Supabase SQL Editor.`
+          : message
+      );
     }
   };
 
@@ -131,7 +141,12 @@ export default function AdminSubCategoriesPage() {
       await deleteSubCategory(sub.id);
       await load();
     } catch (err) {
-      setError(getErrorMessage(err));
+      const message = getErrorMessage(err);
+      setError(
+        message.includes("sub_category")
+          ? `${message} — Run the full supabase/setup.sql file in Supabase SQL Editor.`
+          : message
+      );
     } finally {
       setDeletingId(null);
     }

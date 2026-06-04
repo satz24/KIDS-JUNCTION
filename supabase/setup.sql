@@ -1,12 +1,12 @@
 -- =============================================================================
 -- Kids Junction — Complete Supabase Setup (SINGLE FILE — run this only)
 -- =============================================================================
--- Includes: tables, indexes, storage bucket, RLS policies, table grants, seed data,
---           admin order delete (policy + grant)
+-- Includes: categories, sub-categories, products, orders, storage bucket,
+--           RLS policies, table grants, seed data, admin order delete
 --
 -- How to use:
 --   1. Open Supabase → SQL Editor → New query
---   2. Paste this entire file and click Run (safe to re-run)
+--   2. Paste this entire file and click Run (safe to re-run on existing projects)
 --   3. Create an admin user in Authentication → Users
 --   4. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env
 -- =============================================================================
@@ -39,15 +39,18 @@ create table if not exists public.products (
   description text default '',
   price numeric(10, 2) not null check (price >= 0),
   category_id text not null references public.categories (id) on delete cascade,
-  sub_category_id text references public.sub_categories (id) on delete set null,
   image_url text,
   stock integer not null default 0 check (stock >= 0),
   featured boolean not null default false,
   created_at timestamptz default now() not null
 );
 
+-- Upgrade older projects that were created before sub-categories
+alter table public.products add column if not exists sub_category_id text references public.sub_categories (id) on delete set null;
+
 create index if not exists products_category_id_idx on public.products (category_id);
 create index if not exists products_featured_idx on public.products (featured);
+create index if not exists products_sub_category_id_idx on public.products (sub_category_id);
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
@@ -103,7 +106,6 @@ drop policy if exists "product_images_admin_upload" on storage.objects;
 drop policy if exists "product_images_admin_update" on storage.objects;
 drop policy if exists "product_images_admin_delete" on storage.objects;
 
--- Categories & products: public read
 create policy "categories_public_read"
   on public.categories for select
   to anon, authenticated
@@ -119,7 +121,6 @@ create policy "products_public_read"
   to anon, authenticated
   using (true);
 
--- Categories & products: admin write (logged-in users)
 create policy "categories_admin_write"
   on public.categories for all
   to authenticated
@@ -138,7 +139,6 @@ create policy "products_admin_write"
   using (true)
   with check (true);
 
--- Orders: customers insert via website; admins read, update & delete
 create policy "orders_public_insert"
   on public.orders for insert
   to anon, authenticated
@@ -160,7 +160,6 @@ create policy "orders_admin_delete"
   to authenticated
   using (true);
 
--- Storage: public read, admin upload/update/delete
 create policy "product_images_public_read"
   on storage.objects for select
   to anon, authenticated
@@ -203,7 +202,7 @@ grant select on storage.objects to anon, authenticated;
 grant insert, update, delete on storage.objects to authenticated;
 
 -- -----------------------------------------------------------------------------
--- SEED DATA — 6 store categories + sample products
+-- SEED DATA — categories, sub-categories, sample products
 -- -----------------------------------------------------------------------------
 
 insert into public.categories (id, name, image_url) values
@@ -235,9 +234,6 @@ on conflict (id) do update set
   category_id = excluded.category_id,
   name = excluded.name,
   sort_order = excluded.sort_order;
-
--- Add sub_category_id column on existing projects
-alter table public.products add column if not exists sub_category_id text references public.sub_categories (id) on delete set null;
 
 insert into public.products (name, slug, description, price, category_id, image_url, stock, featured) values
   ('Baby Soft Romper Set', 'baby-soft-romper-set', 'Comfortable cotton romper for newborns.', 599, 'baby', '/brand/KJ_final.jpg', 25, true),
