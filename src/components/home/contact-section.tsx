@@ -74,15 +74,24 @@ export function ContactSection() {
                   </div>
                 </a>
 
-                <a href={storeInfo.landlineLink} className="flex gap-3 group">
+                <div className="flex gap-3">
                   <Phone className="h-5 w-5 text-brand-green shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-sm">Phone</p>
-                    <p className="text-sm text-brand-green font-medium group-hover:underline">
+                    <a
+                      href={storeInfo.mobileLink}
+                      className="block text-sm text-brand-green font-medium hover:underline"
+                    >
+                      {storeInfo.mobile}
+                    </a>
+                    <a
+                      href={storeInfo.landlineLink}
+                      className="block text-sm text-brand-green font-medium hover:underline mt-1"
+                    >
                       {storeInfo.landline}
-                    </p>
+                    </a>
                   </div>
-                </a>
+                </div>
               </div>
 
               <div>

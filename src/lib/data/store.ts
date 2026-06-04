@@ -2,6 +2,8 @@ export const storeInfo = {
   name: "Kids Junction",
   tagline: "... No:1 baby shop ...",
   address: "# 133, G.S.T. Road, Guduvanchery - 603 202",
+  mobile: "97898 83773",
+  mobileLink: "tel:+919789883773",
   landline: "044-4775 8868",
   landlineLink: "tel:+914447758868",
   whatsapp: "9789883773",
@@ -16,8 +18,8 @@ export const storeInfo = {
     url: "https://www.instagram.com/kj_kutties",
   },
   timings: {
-    weekdays: "9:30 AM – 8:30 PM",
-    sunday: "10:00 AM – 8:00 PM",
+    weekdays: "9:30 AM – 9:30 PM",
+    sunday: "9:30 AM – 9:30 PM",
     note: "Open all days",
   },
   about:

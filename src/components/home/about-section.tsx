@@ -37,22 +37,16 @@ const highlights = [
 ];
 
 export function AboutSection() {
-  const { data, loading } = useGoogleReviews();
-  const googleRating = data?.rating ?? 0;
-  const googleReviewCount = data?.totalReviews ?? 0;
+  const { data } = useGoogleReviews();
   const reviewsUrl = data?.profileUrl ?? storeInfo.googleReviews.url;
 
   const stats = [
-    { value: 10, suffix: "+", label: "Years Serving Families", href: undefined },
-    { value: 500, suffix: "+", label: "Products", href: undefined },
+    { value: 13, suffix: "+", label: "Years Serving Families", href: undefined },
+    { value: 2, suffix: "k+", label: "Products", href: undefined },
     {
-      value: googleRating > 0 ? googleRating : 5,
+      value: 4.9,
       suffix: "★",
-      label: loading
-        ? "Google Rating"
-        : googleReviewCount > 0
-          ? `${googleReviewCount} Google Reviews`
-          : "Google Rating",
+      label: "Google Rating",
       href: reviewsUrl,
     },
   ];

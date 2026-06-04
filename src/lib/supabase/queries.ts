@@ -211,12 +211,19 @@ export async function deleteCategory(id: string): Promise<void> {
   if (error) throwQueryError(error);
 }
 
+function isMissingSubCategorySchema(message: string): boolean {
+  return message.includes("sub_category");
+}
+
 export async function fetchSubCategories(categoryId?: string): Promise<DbSubCategory[]> {
   if (!supabase) return [];
   let query = supabase.from("sub_categories").select("*").order("sort_order").order("name");
   if (categoryId) query = query.eq("category_id", categoryId);
   const { data, error } = await query;
-  if (error) throwQueryError(error);
+  if (error) {
+    if (isMissingSubCategorySchema(error.message)) return [];
+    throwQueryError(error);
+  }
   return data ?? [];
 }
 
@@ -243,7 +250,10 @@ export async function deleteSubCategory(id: string): Promise<void> {
 export async function fetchSubCategoryProductCounts(): Promise<Record<string, number>> {
   if (!supabase) return {};
   const { data, error } = await supabase.from("products").select("sub_category_id");
-  if (error) throwQueryError(error);
+  if (error) {
+    if (isMissingSubCategorySchema(error.message)) return {};
+    throwQueryError(error);
+  }
   const counts: Record<string, number> = {};
   for (const row of data ?? []) {
     if (!row.sub_category_id) continue;
@@ -255,7 +265,10 @@ export async function fetchSubCategoryProductCounts(): Promise<Record<string, nu
 export async function fetchSubCategoryCountsByCategory(): Promise<Record<string, number>> {
   if (!supabase) return {};
   const { data, error } = await supabase.from("sub_categories").select("category_id");
-  if (error) throwQueryError(error);
+  if (error) {
+    if (isMissingSubCategorySchema(error.message)) return {};
+    throwQueryError(error);
+  }
   const counts: Record<string, number> = {};
   for (const row of data ?? []) {
     counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;

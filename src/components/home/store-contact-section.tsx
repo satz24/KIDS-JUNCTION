@@ -57,17 +57,26 @@ export function StoreContactSection() {
                   </div>
                 </a>
 
-                <a href={storeInfo.landlineLink} className="flex gap-3 group">
+                <div className="flex gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green/10 text-brand-green">
                     <Phone className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm mb-0.5">Landline</p>
-                    <p className="text-sm text-brand-green font-medium group-hover:underline">
+                    <p className="font-semibold text-sm mb-0.5">Phone</p>
+                    <a
+                      href={storeInfo.mobileLink}
+                      className="block text-sm text-brand-green font-medium hover:underline"
+                    >
+                      {storeInfo.mobile}
+                    </a>
+                    <a
+                      href={storeInfo.landlineLink}
+                      className="block text-sm text-brand-green font-medium hover:underline mt-1"
+                    >
                       {storeInfo.landline}
-                    </p>
+                    </a>
                   </div>
-                </a>
+                </div>
 
                 <a
                   href={storeInfo.whatsappLink}

@@ -10,7 +10,7 @@ import { storeInfo } from "@/lib/data/store";
 const trustItems = [
   { icon: Shield, label: "Quality Assured" },
   { icon: Heart, label: "Parent Trusted" },
-  { icon: Star, label: "5★ Rated Store" },
+  { icon: Star, label: "4.9★ Rated Store" },
 ];
 
 export function Footer() {
@@ -71,6 +71,12 @@ export function Footer() {
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-brand-pink shrink-0 mt-0.5" />
                 {storeInfo.address}
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-brand-green" />
+                <a href={storeInfo.mobileLink} className="hover:text-brand-green transition-colors">
+                  {storeInfo.mobile}
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-brand-green" />
