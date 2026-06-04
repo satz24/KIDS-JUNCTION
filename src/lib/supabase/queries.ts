@@ -1,5 +1,5 @@
 import { resolveImageSrc } from "@/lib/brand/logo-asset";
-import type { DbCategory, DbOrder, DbProduct, OrderCartLine, OrderStatus } from "@/types/database";
+import type { DbCategory, DbOrder, DbProduct, DbSubCategory, OrderCartLine, OrderStatus } from "@/types/database";
 import type { Product } from "@/types";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -37,6 +37,7 @@ export function mapDbProduct(row: DbProduct): Product {
     price: Number(row.price),
     images: [image],
     category: row.category_id,
+    subCategory: row.sub_category_id ?? undefined,
     brand: "Kids Junction",
     ageRange: "All ages",
     rating: 4.8,
@@ -72,12 +73,14 @@ export async function fetchCategoryById(id: string): Promise<DbCategory | null> 
 
 export async function fetchProducts(options?: {
   categoryId?: string;
+  subCategoryId?: string;
   featured?: boolean;
   limit?: number;
 }): Promise<Product[]> {
   if (!supabase) return [];
   let query = supabase.from("products").select("*").order("created_at", { ascending: false });
   if (options?.categoryId) query = query.eq("category_id", options.categoryId);
+  if (options?.subCategoryId) query = query.eq("sub_category_id", options.subCategoryId);
   if (options?.featured) query = query.eq("featured", true);
   if (options?.limit) query = query.limit(options.limit);
   const { data, error } = await query;
@@ -208,6 +211,58 @@ export async function deleteCategory(id: string): Promise<void> {
   if (error) throwQueryError(error);
 }
 
+export async function fetchSubCategories(categoryId?: string): Promise<DbSubCategory[]> {
+  if (!supabase) return [];
+  let query = supabase.from("sub_categories").select("*").order("sort_order").order("name");
+  if (categoryId) query = query.eq("category_id", categoryId);
+  const { data, error } = await query;
+  if (error) throwQueryError(error);
+  return data ?? [];
+}
+
+export async function upsertSubCategory(subCategory: {
+  id: string;
+  category_id: string;
+  name: string;
+  sort_order?: number;
+}): Promise<void> {
+  if (!supabase) throw new Error("Supabase not configured");
+  const { error } = await supabase.from("sub_categories").upsert({
+    ...subCategory,
+    sort_order: subCategory.sort_order ?? 0,
+  });
+  if (error) throwQueryError(error);
+}
+
+export async function deleteSubCategory(id: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase not configured");
+  const { error } = await supabase.from("sub_categories").delete().eq("id", id);
+  if (error) throwQueryError(error);
+}
+
+export async function fetchSubCategoryProductCounts(): Promise<Record<string, number>> {
+  if (!supabase) return {};
+  const { data, error } = await supabase.from("products").select("sub_category_id");
+  if (error) throwQueryError(error);
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    if (!row.sub_category_id) continue;
+    counts[row.sub_category_id] = (counts[row.sub_category_id] ?? 0) + 1;
+  }
+  return counts;
+}
+
+export async function fetchSubCategoryCountsByCategory(): Promise<Record<string, number>> {
+  if (!supabase) return {};
+  const { data, error } = await supabase.from("sub_categories").select("category_id");
+  if (error) throwQueryError(error);
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;
+  }
+  return counts;
+}
+
 export async function upsertProduct(product: {
   id?: string;
   name: string;
@@ -215,6 +270,7 @@ export async function upsertProduct(product: {
   description: string;
   price: number;
   category_id: string;
+  sub_category_id?: string | null;
   image_url?: string | null;
   stock: number;
   featured: boolean;
@@ -260,14 +316,16 @@ export async function uploadCategoryImage(file: File): Promise<string> {
 }
 
 export async function getDashboardStats() {
-  const [products, categories, orders] = await Promise.all([
+  const [products, categories, subCategories, orders] = await Promise.all([
     fetchProducts(),
     fetchCategories(),
+    fetchSubCategories(),
     fetchOrders(),
   ]);
   return {
     productCount: products.length,
     categoryCount: categories.length,
+    subCategoryCount: subCategories.length,
     orderCount: orders.length,
     recentOrders: orders.slice(0, 5),
   };

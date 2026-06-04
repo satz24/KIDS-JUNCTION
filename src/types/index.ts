@@ -10,6 +10,7 @@ export interface Product {
   originalPrice?: number;
   images: string[];
   category: Category;
+  subCategory?: string;
   brand: string;
   ageRange: string;
   sizes?: string[];

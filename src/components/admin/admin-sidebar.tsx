@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Package,
   Grid3X3,
+  Tags,
   ShoppingCart,
   ArrowLeft,
   LogOut,
@@ -18,6 +19,7 @@ const sidebarLinks = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/products", icon: Package, label: "Products" },
   { href: "/admin/categories", icon: Grid3X3, label: "Categories" },
+  { href: "/admin/sub-categories", icon: Tags, label: "Sub Categories" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
 ];
 

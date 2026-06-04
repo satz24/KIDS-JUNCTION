@@ -22,6 +22,16 @@ create table if not exists public.categories (
   created_at timestamptz default now() not null
 );
 
+create table if not exists public.sub_categories (
+  id text primary key,
+  category_id text not null references public.categories (id) on delete cascade,
+  name text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz default now() not null
+);
+
+create index if not exists sub_categories_category_id_idx on public.sub_categories (category_id);
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -29,6 +39,7 @@ create table if not exists public.products (
   description text default '',
   price numeric(10, 2) not null check (price >= 0),
   category_id text not null references public.categories (id) on delete cascade,
+  sub_category_id text references public.sub_categories (id) on delete set null,
   image_url text,
   stock integer not null default 0 check (stock >= 0),
   featured boolean not null default false,
@@ -72,12 +83,15 @@ on conflict (id) do nothing;
 -- -----------------------------------------------------------------------------
 
 alter table public.categories enable row level security;
+alter table public.sub_categories enable row level security;
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
 
 -- Drop existing policies so this script can be re-run safely
 drop policy if exists "categories_public_read" on public.categories;
 drop policy if exists "categories_admin_write" on public.categories;
+drop policy if exists "sub_categories_public_read" on public.sub_categories;
+drop policy if exists "sub_categories_admin_write" on public.sub_categories;
 drop policy if exists "products_public_read" on public.products;
 drop policy if exists "products_admin_write" on public.products;
 drop policy if exists "orders_public_insert" on public.orders;
@@ -95,6 +109,11 @@ create policy "categories_public_read"
   to anon, authenticated
   using (true);
 
+create policy "sub_categories_public_read"
+  on public.sub_categories for select
+  to anon, authenticated
+  using (true);
+
 create policy "products_public_read"
   on public.products for select
   to anon, authenticated
@@ -103,6 +122,12 @@ create policy "products_public_read"
 -- Categories & products: admin write (logged-in users)
 create policy "categories_admin_write"
   on public.categories for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "sub_categories_admin_write"
+  on public.sub_categories for all
   to authenticated
   using (true)
   with check (true);
@@ -165,6 +190,9 @@ grant usage on schema public to anon, authenticated;
 grant select on public.categories to anon, authenticated;
 grant insert, update, delete on public.categories to authenticated;
 
+grant select on public.sub_categories to anon, authenticated;
+grant insert, update, delete on public.sub_categories to authenticated;
+
 grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 
@@ -188,6 +216,28 @@ insert into public.categories (id, name, image_url) values
 on conflict (id) do update set
   name = excluded.name,
   image_url = excluded.image_url;
+
+-- Two placeholder sub-categories per category (same name as parent — rename in admin later)
+insert into public.sub_categories (id, category_id, name, sort_order) values
+  ('toys-school-1', 'toys-school', 'Baby Cycles', 1),
+  ('toys-school-2', 'toys-school', 'Baby Cycles', 2),
+  ('girls-1', 'girls', 'Battery Cars', 1),
+  ('girls-2', 'girls', 'Battery Cars', 2),
+  ('baby-1', 'baby', 'Just Born Needs', 1),
+  ('baby-2', 'baby', 'Just Born Needs', 2),
+  ('baby-essentials-1', 'baby-essentials', 'Kids Wear', 1),
+  ('baby-essentials-2', 'baby-essentials', 'Kids Wear', 2),
+  ('boys-1', 'boys', 'Mother Care', 1),
+  ('boys-2', 'boys', 'Mother Care', 2),
+  ('gift-sets-1', 'gift-sets', 'Toys and Games', 1),
+  ('gift-sets-2', 'gift-sets', 'Toys and Games', 2)
+on conflict (id) do update set
+  category_id = excluded.category_id,
+  name = excluded.name,
+  sort_order = excluded.sort_order;
+
+-- Add sub_category_id column on existing projects
+alter table public.products add column if not exists sub_category_id text references public.sub_categories (id) on delete set null;
 
 insert into public.products (name, slug, description, price, category_id, image_url, stock, featured) values
   ('Baby Soft Romper Set', 'baby-soft-romper-set', 'Comfortable cotton romper for newborns.', 599, 'baby', '/brand/KJ_final.jpg', 25, true),

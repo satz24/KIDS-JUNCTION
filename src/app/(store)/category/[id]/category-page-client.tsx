@@ -3,10 +3,11 @@
 import { useMemo, useState, use } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useCategories, useProducts } from "@/hooks/use-catalog";
+import { useCategories, useProducts, useSubCategories } from "@/hooks/use-catalog";
 import { ShowcaseCard } from "@/components/products/showcase-card";
 import { ProductInquiryModal } from "@/components/products/product-inquiry-modal";
 import { PriceSortSelect } from "@/components/products/price-sort-select";
+import { SubCategoryStrip } from "@/components/products/sub-category-strip";
 import { sortProductsByPrice, type PriceSort } from "@/lib/products/sort-products";
 import type { Product } from "@/types";
 
@@ -14,7 +15,12 @@ export function CategoryPageClient({ params }: { params: Promise<{ id: string }>
   const { id } = use(params);
   const { categories } = useCategories();
   const category = categories.find((c) => c.id === id);
-  const { products, loading } = useProducts({ categoryId: id });
+  const { subCategories } = useSubCategories(id);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
+  const { products, loading } = useProducts({
+    categoryId: id,
+    subCategoryId: selectedSubCategoryId ?? undefined,
+  });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [sort, setSort] = useState<PriceSort>("default");
@@ -33,6 +39,12 @@ export function CategoryPageClient({ params }: { params: Promise<{ id: string }>
         >
           <ArrowLeft className="h-4 w-4" /> All Collections
         </Link>
+
+        <SubCategoryStrip
+          subCategories={subCategories}
+          selectedId={selectedSubCategoryId}
+          onSelect={setSelectedSubCategoryId}
+        />
 
         <div className="flex items-start justify-between gap-3 mb-8">
           <h1 className="font-display heading-lg">{category?.name ?? id}</h1>
@@ -58,7 +70,11 @@ export function CategoryPageClient({ params }: { params: Promise<{ id: string }>
         )}
 
         {!loading && sortedProducts.length === 0 && (
-          <p className="text-center text-muted-foreground py-16">No products in this category yet.</p>
+          <p className="text-center text-muted-foreground py-16">
+            {selectedSubCategoryId
+              ? "No products in this sub-category yet."
+              : "No products in this category yet."}
+          </p>
         )}
       </div>
 

@@ -6,13 +6,14 @@ import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import {
   deleteProduct,
   fetchCategories,
+  fetchSubCategories,
   getErrorMessage,
   slugify,
   upsertProduct,
   uploadProductImage,
   isSupabaseConfigured,
 } from "@/lib/supabase/queries";
-import type { DbCategory, DbProduct } from "@/types/database";
+import type { DbCategory, DbProduct, DbSubCategory } from "@/types/database";
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
 import { CategoryCircleImage } from "@/components/products/category-circle-image";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import { formatPrice } from "@/lib/utils";
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<DbProduct[]>([]);
   const [categories, setCategories] = useState<DbCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<DbSubCategory[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DbProduct | null>(null);
@@ -33,6 +35,7 @@ export default function AdminProductsPage() {
     name: "",
     price: "",
     category_id: "baby",
+    sub_category_id: "",
     stock: "",
     description: "",
     featured: false,
@@ -42,7 +45,7 @@ export default function AdminProductsPage() {
 
   const load = async () => {
     try {
-      const [p, c] = await Promise.all([
+      const [p, c, s] = await Promise.all([
         isSupabaseConfigured
           ? (async () => {
               const { supabase } = await import("@/lib/supabase/client");
@@ -56,20 +59,28 @@ export default function AdminProductsPage() {
             })()
           : [],
         fetchCategories(),
+        fetchSubCategories(),
       ]);
       setProducts(p);
       setCategories(c);
+      setSubCategories(s);
       setError(null);
     } catch (err) {
       setError(getErrorMessage(err));
       setProducts([]);
       setCategories([]);
+      setSubCategories([]);
     }
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  const formSubCategories = useMemo(
+    () => subCategories.filter((sub) => sub.category_id === form.category_id),
+    [subCategories, form.category_id]
+  );
 
   const productSections = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -112,6 +123,7 @@ export default function AdminProductsPage() {
       name: "",
       price: "",
       category_id: categories[0]?.id ?? "baby",
+      sub_category_id: "",
       stock: "",
       description: "",
       featured: false,
@@ -145,6 +157,7 @@ export default function AdminProductsPage() {
         description: form.description,
         price: parseFloat(form.price),
         category_id: form.category_id,
+        sub_category_id: form.sub_category_id || null,
         image_url: form.image_url || "/brand/KJ_final.jpg",
         stock: parseInt(form.stock) || 0,
         featured: form.featured,
@@ -162,6 +175,7 @@ export default function AdminProductsPage() {
       name: product.name,
       price: String(product.price),
       category_id: product.category_id,
+      sub_category_id: product.sub_category_id ?? "",
       stock: String(product.stock),
       description: product.description,
       featured: product.featured,
@@ -225,10 +239,25 @@ export default function AdminProductsPage() {
                 <select
                   className="flex h-11 w-full rounded-xl surface-input px-3 text-sm"
                   value={form.category_id}
-                  onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, category_id: e.target.value, sub_category_id: "" })
+                  }
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Sub Category (optional)</Label>
+                <select
+                  className="flex h-11 w-full rounded-xl surface-input px-3 text-sm"
+                  value={form.sub_category_id}
+                  onChange={(e) => setForm({ ...form, sub_category_id: e.target.value })}
+                >
+                  <option value="">None</option>
+                  {formSubCategories.map((sub) => (
+                    <option key={sub.id} value={sub.id}>{sub.name}</option>
                   ))}
                 </select>
               </div>

@@ -7,6 +7,7 @@ import {
   deleteCategory,
   fetchCategories,
   fetchCategoryProductCounts,
+  fetchSubCategoryCountsByCategory,
   getErrorMessage,
   slugify,
   upsertCategory,
@@ -24,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<DbCategory[]>([]);
   const [productCounts, setProductCounts] = useState<Record<string, number>>({});
+  const [subCategoryCounts, setSubCategoryCounts] = useState<Record<string, number>>({});
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DbCategory | null>(null);
   const [form, setForm] = useState({ id: "", name: "", image_url: "" });
@@ -33,14 +35,20 @@ export default function AdminCategoriesPage() {
 
   const load = async () => {
     try {
-      const [data, counts] = await Promise.all([fetchCategories(), fetchCategoryProductCounts()]);
+      const [data, counts, subCounts] = await Promise.all([
+        fetchCategories(),
+        fetchCategoryProductCounts(),
+        fetchSubCategoryCountsByCategory(),
+      ]);
       setCategories(data);
       setProductCounts(counts);
+      setSubCategoryCounts(subCounts);
       setError(null);
     } catch (err) {
       setError(getErrorMessage(err));
       setCategories([]);
       setProductCounts({});
+      setSubCategoryCounts({});
     }
   };
 
@@ -176,6 +184,7 @@ export default function AdminCategoriesPage() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((cat) => {
           const count = productCounts[cat.id] ?? 0;
+          const subCount = subCategoryCounts[cat.id] ?? 0;
           return (
             <Card key={cat.id} className="glass-card border-0">
               <CardContent className="p-4 flex items-center gap-3">
@@ -189,7 +198,8 @@ export default function AdminCategoriesPage() {
                   <p className="font-bold truncate">{cat.name}</p>
                   <p className="text-xs text-muted-foreground">{cat.id}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {count} product{count === 1 ? "" : "s"}
+                    {count} product{count === 1 ? "" : "s"} · {subCount} sub-categor
+                    {subCount === 1 ? "y" : "ies"}
                   </p>
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => handleEdit(cat)}>

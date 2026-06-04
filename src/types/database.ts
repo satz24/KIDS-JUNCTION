@@ -5,6 +5,14 @@ export interface DbCategory {
   created_at: string;
 }
 
+export interface DbSubCategory {
+  id: string;
+  category_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface DbProduct {
   id: string;
   name: string;
@@ -12,6 +20,7 @@ export interface DbProduct {
   description: string;
   price: number;
   category_id: string;
+  sub_category_id: string | null;
   image_url: string | null;
   stock: number;
   featured: boolean;
