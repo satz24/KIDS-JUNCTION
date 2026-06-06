@@ -19,8 +19,8 @@ export function MobileNav() {
   const itemCount = useCartStore((s) => s.getItemCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden premium-glass-v2 border border-[var(--glass-v2-border)] mx-3 mb-3 rounded-[1.5rem] shadow-[var(--glass-v2-shadow)] theme-surface">
-      <div className="flex items-center justify-around h-16 px-1">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden premium-glass-v2 border border-[var(--glass-v2-border)] mx-2 mb-2 rounded-[1.25rem] shadow-[var(--glass-v2-shadow)] theme-surface pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="grid grid-cols-5 h-[4.25rem] min-h-[4.25rem]">
         {navItems.map((item) => {
           const isActive =
             item.href === "/cart"
@@ -34,17 +34,21 @@ export function MobileNav() {
               key={item.label}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors min-w-[52px] relative",
+                "flex min-w-0 flex-col items-center justify-center gap-0.5 px-0.5 py-1 rounded-xl transition-colors relative",
                 isActive ? "text-brand-pink" : "text-muted-foreground"
               )}
             >
-              <item.icon className={cn("h-5 w-5", isActive && "scale-110")} />
-              <span className="text-[10px] font-medium">{item.label}</span>
-              {item.showBadge && itemCount > 0 && (
-                <span className="absolute top-0 right-1 flex h-4 w-4 items-center justify-center rounded-full gradient-brand text-[9px] font-bold text-white shadow-sm">
-                  {itemCount}
-                </span>
-              )}
+              <span className="relative inline-flex shrink-0">
+                <item.icon className={cn("h-[1.15rem] w-[1.15rem]", isActive && "scale-110")} />
+                {item.showBadge && itemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full gradient-brand text-[8px] font-bold text-white shadow-sm">
+                    {itemCount > 9 ? "9+" : itemCount}
+                  </span>
+                )}
+              </span>
+              <span className="w-full truncate text-center text-[9px] font-semibold leading-none">
+                {item.label}
+              </span>
             </Link>
           );
         })}

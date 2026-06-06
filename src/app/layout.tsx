@@ -53,15 +53,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      data-theme="light"
+      style={{ colorScheme: "light" }}
+    >
       <body
         className={`${dmSans.variable} ${nunito.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
       >
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=JSON.parse(localStorage.getItem('kj-theme')||'{}');var t=s&&s.state&&s.state.theme;if(t){document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}}catch(e){}})();`,
-          }}
-        />
         <ClientProviders>
           <ThemeProvider>
             <CursorGlow />

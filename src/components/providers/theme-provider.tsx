@@ -4,11 +4,12 @@ import { useEffect, type ReactNode } from "react";
 import { applyThemeToDocument, useThemeStore } from "@/lib/store/theme-store";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
   useEffect(() => {
-    applyThemeToDocument(theme);
-  }, [theme]);
+    setTheme("light");
+    applyThemeToDocument("light");
+  }, [setTheme]);
 
   return children;
 }

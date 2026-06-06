@@ -10,7 +10,7 @@ export function CategoryStrip() {
   const pathname = usePathname();
   const { categories, loading } = useCategories();
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/auth")) {
+  if (pathname !== "/") {
     return null;
   }
 
