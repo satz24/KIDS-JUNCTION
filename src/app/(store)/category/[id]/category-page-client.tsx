@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, use } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useCategories, useProducts, useSubCategories } from "@/hooks/use-catalog";
@@ -11,14 +11,13 @@ import { SubCategoryStrip } from "@/components/products/sub-category-strip";
 import { sortProductsByPrice, type PriceSort } from "@/lib/products/sort-products";
 import type { Product } from "@/types";
 
-export function CategoryPageClient({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export function CategoryPageClient({ categoryId }: { categoryId: string }) {
   const { categories } = useCategories();
-  const category = categories.find((c) => c.id === id);
-  const { subCategories } = useSubCategories(id);
+  const category = categories.find((c) => c.id === categoryId);
+  const { subCategories } = useSubCategories(categoryId);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
   const { products, loading } = useProducts({
-    categoryId: id,
+    categoryId,
     subCategoryId: selectedSubCategoryId ?? undefined,
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -46,8 +45,15 @@ export function CategoryPageClient({ params }: { params: Promise<{ id: string }>
           onSelect={setSelectedSubCategoryId}
         />
 
-        <div className="flex items-start justify-between gap-3 mb-8">
-          <h1 className="font-display heading-lg">{category?.name ?? id}</h1>
+        <div className="flex items-start justify-between gap-4 mb-8">
+          <div className="min-w-0">
+            <h1 className="font-display heading-lg">{category?.name ?? categoryId}</h1>
+            {!loading && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {sortedProducts.length} product{sortedProducts.length === 1 ? "" : "s"}
+              </p>
+            )}
+          </div>
           <PriceSortSelect sort={sort} onSortChange={setSort} />
         </div>
 

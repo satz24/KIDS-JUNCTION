@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type { DbSubCategory } from "@/types/database";
 
@@ -9,11 +10,27 @@ interface SubCategoryStripProps {
   onSelect: (subCategoryId: string | null) => void;
 }
 
+function getSubCategoryLabel(sub: DbSubCategory, all: DbSubCategory[]): string {
+  const sameName = all.filter((item) => item.name === sub.name);
+  if (sameName.length <= 1) return sub.name;
+  const index = sameName.findIndex((item) => item.id === sub.id);
+  return `${sub.name} ${index + 1}`;
+}
+
 export function SubCategoryStrip({
   subCategories,
   selectedId,
   onSelect,
 }: SubCategoryStripProps) {
+  const labels = useMemo(
+    () =>
+      subCategories.map((sub) => ({
+        sub,
+        label: getSubCategoryLabel(sub, subCategories),
+      })),
+    [subCategories]
+  );
+
   if (subCategories.length === 0) return null;
 
   return (
@@ -31,7 +48,7 @@ export function SubCategoryStrip({
         >
           All
         </button>
-        {subCategories.map((sub) => (
+        {labels.map(({ sub, label }) => (
           <button
             key={sub.id}
             type="button"
@@ -43,7 +60,7 @@ export function SubCategoryStrip({
                 : "glass-card text-muted-foreground hover:text-brand-pink hover:border-brand-pink/30"
             )}
           >
-            {sub.name}
+            {label}
           </button>
         ))}
       </div>

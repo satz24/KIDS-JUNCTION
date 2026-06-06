@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Love_Ya_Like_A_Sister } from "next/font/google";
+import { DM_Sans, Nunito, Love_Ya_Like_A_Sister } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/components/providers/client-providers";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AddToCartToast } from "@/components/shared/add-to-cart-toast";
 import { CursorGlow } from "@/components/shared/cursor-glow";
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const nunito = Nunito({
+  variable: "--font-nunito",
+  weight: ["400", "600", "700", "800", "900"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -45,14 +53,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body
-        className={`${jakarta.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
+        className={`${dmSans.variable} ${nunito.variable} ${loveYaLikeASister.variable} min-h-screen flex flex-col antialiased`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=JSON.parse(localStorage.getItem('kj-theme')||'{}');var t=s&&s.state&&s.state.theme;if(t){document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}}catch(e){}})();`,
+          }}
+        />
         <ClientProviders>
-          <CursorGlow />
-          {children}
-          <AddToCartToast />
+          <ThemeProvider>
+            <CursorGlow />
+            {children}
+            <AddToCartToast />
+          </ThemeProvider>
         </ClientProviders>
       </body>
     </html>

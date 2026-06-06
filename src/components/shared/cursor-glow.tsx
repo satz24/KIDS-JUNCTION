@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 export function CursorGlow() {
   const glowRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -13,25 +14,52 @@ export function CursorGlow() {
 
     setEnabled(true);
     let rafId = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    let cardHover = false;
+
+    const animate = () => {
+      currentX += (targetX - currentX) * 0.14;
+      currentY += (targetY - currentY) * 0.14;
+
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(${currentX - 200}px, ${currentY - 200}px, 0)`;
+      }
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${targetX - 5}px, ${targetY - 5}px, 0)`;
+      }
+      if (ringRef.current) {
+        const scale = cardHover ? 1.35 : 1;
+        ringRef.current.style.transform = `translate3d(${currentX - 22}px, ${currentY - 22}px, 0) scale(${scale})`;
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
 
     const handleMove = (e: MouseEvent) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const { clientX: x, clientY: y } = e;
-        if (glowRef.current) {
-          glowRef.current.style.transform = `translate3d(${x - 180}px, ${y - 180}px, 0)`;
-          glowRef.current.style.opacity = "0.14";
-        }
-        if (dotRef.current) {
-          dotRef.current.style.transform = `translate3d(${x - 6}px, ${y - 6}px, 0)`;
-          dotRef.current.style.opacity = "0.8";
-        }
-      });
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (glowRef.current) glowRef.current.style.opacity = "0.18";
+      if (dotRef.current) dotRef.current.style.opacity = "1";
+      if (ringRef.current) ringRef.current.style.opacity = "0.55";
+
+      const target = (e.target as HTMLElement | null)?.closest("[data-cursor-card]");
+      cardHover = Boolean(target);
+      if (ringRef.current) {
+        ringRef.current.style.borderColor = cardHover
+          ? "rgba(255, 95, 183, 0.55)"
+          : "rgba(103, 199, 255, 0.35)";
+      }
     };
 
     const handleLeave = () => {
       if (glowRef.current) glowRef.current.style.opacity = "0";
       if (dotRef.current) dotRef.current.style.opacity = "0";
+      if (ringRef.current) ringRef.current.style.opacity = "0";
     };
 
     window.addEventListener("mousemove", handleMove, { passive: true });
@@ -50,21 +78,17 @@ export function CursorGlow() {
     <>
       <div
         ref={glowRef}
-        className="pointer-events-none fixed left-0 top-0 z-[9999] hidden md:block mix-blend-normal opacity-0 will-change-transform"
-        style={{ transition: "opacity 0.2s ease" }}
+        className="pointer-events-none fixed left-0 top-0 z-[9997] hidden md:block opacity-0 will-change-transform"
       >
-        <div
-          className="h-[360px] w-[360px] rounded-full blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,107,203,0.35) 0%, rgba(106,190,255,0.25) 45%, rgba(107,255,175,0.2) 70%, transparent 75%)",
-          }}
-        />
+        <div className="cursor-glow-aura" />
       </div>
       <div
+        ref={ringRef}
+        className="pointer-events-none fixed left-0 top-0 z-[9998] hidden md:block h-11 w-11 rounded-full border opacity-0 will-change-transform transition-[scale,border-color] duration-300"
+      />
+      <div
         ref={dotRef}
-        className="pointer-events-none fixed left-0 top-0 z-[9998] hidden md:block h-3 w-3 rounded-full border border-brand-pink/40 bg-brand-pink/20 opacity-0 will-change-transform"
-        style={{ transition: "opacity 0.2s ease" }}
+        className="pointer-events-none fixed left-0 top-0 z-[9999] hidden md:block h-2.5 w-2.5 rounded-full opacity-0 will-change-transform cursor-glow-dot"
       />
     </>
   );

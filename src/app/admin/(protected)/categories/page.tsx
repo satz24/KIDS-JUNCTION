@@ -17,6 +17,7 @@ import {
 import type { DbCategory } from "@/types/database";
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
 import { CategoryCircleImage } from "@/components/products/category-circle-image";
+import { categoryImageUsesContain } from "@/lib/brand/category-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,7 +193,7 @@ export default function AdminCategoriesPage() {
                   src={cat.image_url}
                   alt={cat.name}
                   size="sm"
-                  contain={!cat.image_url?.startsWith("http")}
+                  contain={categoryImageUsesContain(cat.image_url)}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold truncate">{cat.name}</p>

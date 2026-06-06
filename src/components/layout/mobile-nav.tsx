@@ -19,7 +19,7 @@ export function MobileNav() {
   const itemCount = useCartStore((s) => s.getItemCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden glass-nav border-t border-[var(--border-color)] mx-3 mb-3 rounded-[1.5rem] shadow-[var(--shadow-soft)] theme-surface">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden premium-glass-v2 border border-[var(--glass-v2-border)] mx-3 mb-3 rounded-[1.5rem] shadow-[var(--glass-v2-shadow)] theme-surface">
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {
           const isActive =

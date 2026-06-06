@@ -11,13 +11,15 @@ import {
 } from "lucide-react";
 import { storeInfo } from "@/lib/data/store";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
+import { DecorativeBg } from "@/components/shared/decorative-bg";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 import { FacebookIcon, InstagramIcon } from "@/components/brand/social-icons";
 
 export function ContactSection() {
   return (
-    <section id="contact" className="py-16 md:py-24 relative section-bg-pink section-glow theme-surface">
+    <section id="contact" className="py-16 md:py-24 relative section-bg-pink section-glow theme-surface premium-section">
+      <DecorativeBg variant="pink" />
       <div className="container mx-auto px-4 relative">
         <ScrollReveal className="text-center mb-12">
           <h2 className="font-display heading-lg mb-3">
@@ -30,7 +32,7 @@ export function ContactSection() {
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <ScrollReveal>
-            <div className="rounded-[1.75rem] overflow-hidden glass-card h-64 lg:h-full min-h-[280px] ring-2 ring-[var(--glass-border)]">
+            <div className="contact-map-frame h-64 lg:h-full min-h-[280px]">
               <iframe
                 src={storeInfo.mapEmbed}
                 width="100%"
@@ -46,7 +48,7 @@ export function ContactSection() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <div className="rounded-[1.75rem] glass-card p-6 md:p-8 space-y-6 h-full">
+            <div className="contact-info-card p-6 md:p-8 space-y-6 h-full">
               <Logo size="md" />
 
               <div className="space-y-4">
@@ -61,6 +63,7 @@ export function ContactSection() {
                       Sunday: {storeInfo.timings.sunday}
                     </p>
                     <p className="text-xs text-brand-green mt-1">{storeInfo.timings.note}</p>
+                    <span className="open-days-pill">Open All Days</span>
                   </div>
                 </div>
 
@@ -100,10 +103,7 @@ export function ContactSection() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {storeInfo.products.map((item) => (
-                    <span
-                      key={item}
-                      className="text-xs px-3 py-1 rounded-full bg-muted font-medium"
-                    >
+                    <span key={item} className="contact-tag">
                       {item}
                     </span>
                   ))}
@@ -112,7 +112,7 @@ export function ContactSection() {
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <a href={storeInfo.whatsappLink} target="_blank" rel="noopener noreferrer" className="flex-1">
-                  <Button size="lg" variant="gradient" className="w-full">
+                  <Button size="lg" variant="gradient" className="w-full whatsapp-pulse">
                     <MessageCircle className="h-5 w-5" />
                     WhatsApp Us
                   </Button>

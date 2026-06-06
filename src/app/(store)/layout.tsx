@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header";
 import { CategoryStrip } from "@/components/layout/category-strip";
-import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { FloatingWhatsAppButton } from "@/components/layout/floating-whatsapp-button";
 import { FloatingCartButton } from "@/components/layout/floating-cart-button";
@@ -12,7 +11,6 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <Header />
       <CategoryStrip />
       <main className="flex-1 pb-20 md:pb-0 theme-surface">{children}</main>
-      <Footer />
       <MobileNav />
       <StickyMobileCartBar />
       <FloatingCartButton />

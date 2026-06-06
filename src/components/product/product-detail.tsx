@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Star,
   Heart,
   ShoppingBag,
   Truck,
@@ -15,7 +14,7 @@ import {
   Plus,
   Check,
 } from "lucide-react";
-import { getRelatedProducts, reviews } from "@/lib/data/products";
+import { getRelatedProducts } from "@/lib/data/products";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useWishlistStore } from "@/lib/store/wishlist-store";
 import { useRecentlyViewedStore } from "@/lib/store/recently-viewed-store";
@@ -76,11 +75,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
       availability: product.inStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: product.rating,
-      reviewCount: product.reviewCount,
     },
   };
 
@@ -150,24 +144,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">
                   {product.name}
                 </h1>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={cn(
-                          "h-4 w-4",
-                          i < Math.floor(product.rating)
-                            ? "fill-yellow text-yellow"
-                            : "text-muted-foreground/30"
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {product.rating} ({product.reviewCount} reviews)
-                  </span>
-                </div>
               </div>
 
               <div className="flex items-baseline gap-3">
@@ -304,9 +280,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <Tabs defaultValue="description">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="reviews">
-                Reviews ({product.reviewCount})
-              </TabsTrigger>
               <TabsTrigger value="delivery">Delivery Info</TabsTrigger>
             </TabsList>
             <TabsContent value="description" className="mt-6">
@@ -320,30 +293,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   ))}
                 </div>
               </div>
-            </TabsContent>
-            <TabsContent value="reviews" className="mt-6 space-y-6">
-              {reviews.map((review) => (
-                <div key={review.id} className="flex gap-4 p-4 rounded-2xl border">
-                  <Image
-                    src={review.avatar}
-                    alt={review.author}
-                    width={48}
-                    height={48}
-                    className="rounded-full object-cover shrink-0"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-sm">{review.author}</span>
-                      <div className="flex">
-                        {Array.from({ length: review.rating }).map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-yellow text-yellow" />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{review.comment}</p>
-                  </div>
-                </div>
-              ))}
             </TabsContent>
             <TabsContent value="delivery" className="mt-6">
               <div className="space-y-4 text-sm text-muted-foreground">

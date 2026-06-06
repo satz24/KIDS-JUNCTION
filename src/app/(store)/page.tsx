@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/home/hero-section";
 import { ProductShowcaseSection } from "@/components/home/product-showcase-section";
 import { AboutSection } from "@/components/home/about-section";
 import { ContactSection } from "@/components/home/contact-section";
+import { SectionDivider } from "@/components/shared/section-divider";
 import { storeInfo } from "@/lib/data/store";
 import { Suspense } from "react";
 
@@ -45,10 +46,13 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HeroSection />
+      <SectionDivider tone="blend" />
       <Suspense fallback={null}>
         <ProductShowcaseSection limit={8} />
       </Suspense>
+      <SectionDivider tone="mint" />
       <AboutSection />
+      <SectionDivider tone="pink" flip />
       <ContactSection />
     </>
   );

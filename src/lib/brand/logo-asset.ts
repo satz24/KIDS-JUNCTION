@@ -20,7 +20,14 @@ export const STORE_FRONT_ALT = "Kids Junction store at Guduvanchery";
 /** Resolve local public paths for GitHub Pages basePath; keep remote URLs unchanged. */
 export function resolveImageSrc(src: string | null | undefined): string {
   if (!src) return BRAND_LOGO_SRC;
-  if (src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
+    src.startsWith("blob:") ||
+    src.startsWith("data:")
+  ) {
+    return src;
+  }
   return withBasePath(src);
 }
 

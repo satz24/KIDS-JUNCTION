@@ -1,0 +1,27 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+export type ThemeMode = "light" | "dark";
+
+interface ThemeState {
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  toggleTheme: () => void;
+}
+
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set, get) => ({
+      theme: "light",
+      setTheme: (theme) => set({ theme }),
+      toggleTheme: () => set({ theme: get().theme === "light" ? "dark" : "light" }),
+    }),
+    { name: "kj-theme" }
+  )
+);
+
+export function applyThemeToDocument(theme: ThemeMode) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+}

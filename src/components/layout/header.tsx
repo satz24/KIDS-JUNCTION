@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { resolveImageSrc } from "@/lib/brand/logo-asset";
-import { storeInfo } from "@/lib/data/store";
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -22,45 +22,51 @@ import { searchProducts } from "@/lib/data/products";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import type { Product } from "@/types";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { cn } from "@/lib/utils";
 
-type NavAccent = "pink" | "blue" | "green" | "lavender";
+type SectionId = "home" | "collections" | "collection" | "about" | "contact";
 
 const navLinks: {
   href: string;
   label: string;
   icon: LucideIcon;
-  accent: NavAccent;
+  section: SectionId;
 }[] = [
-  { href: "/#home", label: "Home", icon: Home, accent: "pink" },
-  { href: "/#collection", label: "Shop", icon: Grid3X3, accent: "blue" },
-  { href: "/#about", label: "About", icon: Heart, accent: "green" },
-  { href: "/#contact", label: "Visit", icon: MapPin, accent: "lavender" },
+  { href: "/#home", label: "Home", icon: Home, section: "home" },
+  { href: "/#collection", label: "Shop", icon: Grid3X3, section: "collection" },
+  { href: "/#about", label: "About", icon: Heart, section: "about" },
+  { href: "/#contact", label: "Visit", icon: MapPin, section: "contact" },
 ];
 
-function NavTab({
+function PremiumNavLink({
   href,
   label,
   icon: Icon,
-  accent,
+  active,
   onClick,
-  className,
 }: {
   href: string;
   label: string;
   icon: LucideIcon;
-  accent: NavAccent;
+  active: boolean;
   onClick?: () => void;
-  className?: string;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={cn("nav-tab", `nav-tab-${accent}`, className)}
+      className={cn("premium-nav-link", active && "premium-nav-link--active")}
     >
-      <Icon className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={2.5} />
-      {label}
+      {active && (
+        <motion.span
+          layoutId="premium-nav-indicator"
+          className="premium-nav-link__indicator"
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+        />
+      )}
+      <Icon className="premium-nav-link__icon" strokeWidth={2.25} />
+      <span>{label}</span>
     </Link>
   );
 }
@@ -70,14 +76,39 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId>("home");
   const searchRef = useRef<HTMLDivElement>(null);
   const itemCount = useCartStore((s) => s.getItemCount());
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sectionIds: SectionId[] = ["home", "collections", "collection", "about", "contact"];
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) {
+          setActiveSection(visible.target.id as SectionId);
+        }
+      },
+      { rootMargin: "-30% 0px -55% 0px", threshold: [0.1, 0.25, 0.5] }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -100,41 +131,40 @@ export function Header() {
 
   return (
     <>
-      <div className="gradient-brand text-white text-center text-xs sm:text-sm py-2.5 px-4">
-        <span className="inline-flex items-center gap-1.5 font-semibold flex-wrap justify-center">
-          <span className="italic opacity-95">{storeInfo.tagline}</span>
-          <span className="hidden sm:inline opacity-60">·</span>
-          <span className="hidden sm:inline opacity-95">Order via WhatsApp — No online payment</span>
-        </span>
-      </div>
+      <AnnouncementBar />
 
-      <div className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-2">
+      <div className="premium-nav-shell">
         <motion.header
-          initial={{ y: -20, opacity: 0 }}
+          initial={{ y: -24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={cn(
-            "glass-nav rounded-[1.75rem] transition-shadow duration-300",
-            scrolled && "shadow-[var(--shadow-float)]"
-          )}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className={cn("premium-nav-bar", scrolled && "premium-nav-bar--scrolled")}
         >
-          <div className="container mx-auto px-3 sm:px-4">
-            <div className="flex h-[4.25rem] items-center justify-between gap-2 lg:gap-3">
-              <Link href="/" className="shrink-0 min-w-0">
+          <div className="container mx-auto px-3 sm:px-5">
+            <div className="flex h-[4.5rem] items-center justify-between gap-3">
+              <Link href="/" className="shrink-0 min-w-0 premium-nav-logo">
                 <Logo size="md" />
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-1.5 shrink-0">
+              <nav className="hidden lg:flex items-center premium-nav-pill">
                 {navLinks.map((link) => (
-                  <NavTab key={link.href} {...link} />
+                  <PremiumNavLink
+                    key={link.href}
+                    {...link}
+                    active={activeSection === link.section}
+                  />
                 ))}
               </nav>
 
-              <div ref={searchRef} className="hidden md:block relative flex-1 max-w-xs lg:max-w-[15rem] xl:max-w-xs">
-                <div className="nav-search-wrap relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue pointer-events-none" />
+              <div
+                ref={searchRef}
+                className="hidden md:block relative flex-1 max-w-xs lg:max-w-[15rem]"
+              >
+                <div className="premium-search-wrap relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue pointer-events-none" />
                   <Input
                     placeholder="Search products..."
-                    className="pl-10 h-10 border-0 bg-transparent shadow-none focus-visible:ring-0 rounded-[inherit]"
+                    className="pl-10 h-10 border-0 bg-transparent shadow-none focus-visible:ring-0 rounded-[inherit] text-sm"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -149,7 +179,7 @@ export function Header() {
                       initial={{ opacity: 0, y: -8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                      className="absolute top-full mt-2 w-full rounded-2xl glass-card overflow-hidden z-50"
+                      className="absolute top-full mt-2 w-full rounded-2xl premium-glass-panel overflow-hidden z-50"
                     >
                       {searchResults.map((product) => (
                         <Link
@@ -170,7 +200,7 @@ export function Header() {
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold truncate">{product.name}</p>
-                            <p className="text-xs text-brand-green font-bold">
+                            <p className="text-xs text-brand-mint font-bold">
                               {formatPrice(product.price)}
                             </p>
                           </div>
@@ -181,28 +211,25 @@ export function Header() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
+                <ThemeToggle />
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden nav-icon-btn nav-icon-btn-cart rounded-xl"
+                  className="md:hidden premium-icon-btn"
                   onClick={() => setSearchOpen(!searchOpen)}
                   aria-label="Search"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
 
-                <Link
-                  href="/cart"
-                  className="relative inline-flex nav-icon-btn nav-icon-btn-cart text-foreground"
-                  aria-label="Cart"
-                >
+                <Link href="/cart" className="relative premium-icon-btn" aria-label="Cart">
                   <ShoppingBag className="h-[1.15rem] w-[1.15rem]" strokeWidth={2.25} />
                   {itemCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1.5 -right-1.5 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-brand-pink px-1 text-[9px] font-bold text-white shadow-md ring-2 ring-white"
+                      className="absolute -top-1.5 -right-1.5 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-brand-pink px-1 text-[9px] font-bold text-white shadow-lg ring-2 ring-white"
                     >
                       {itemCount}
                     </motion.span>

@@ -6,6 +6,7 @@ import { Heart, Leaf, Tag, Shield, Sparkles, Users, ExternalLink } from "lucide-
 import { storeInfo } from "@/lib/data/store";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/shared/scroll-reveal";
+import { DecorativeBg } from "@/components/shared/decorative-bg";
 import { GoogleReviewsPanel } from "@/components/home/google-reviews-panel";
 import { useGoogleReviews } from "@/hooks/use-google-reviews";
 
@@ -52,14 +53,17 @@ export function AboutSection() {
   ];
 
   return (
-    <section id="about" className="py-16 md:py-24 section-bg-green section-glow relative theme-surface">
-      <div className="container mx-auto px-4">
-        <ScrollReveal className="text-center mb-12 max-w-2xl mx-auto">
-          <p className="text-brand-pink italic text-sm mb-2">{storeInfo.tagline}</p>
+    <section id="about" className="py-16 md:py-24 section-bg-green section-glow relative theme-surface premium-section about-mesh-bg">
+      <DecorativeBg variant="mint" />
+      <div className="container mx-auto px-4 relative">
+        <ScrollReveal className="text-center mb-12 max-w-3xl mx-auto">
+          <p className="shimmer-badge inline-flex mb-4">No:1 baby shop in Guduvanchery</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            About <span className="text-brand-green">Kids Junction</span>
+            About <span className="gradient-text">Kids Junction</span>
           </h2>
-          <p className="text-muted-foreground leading-relaxed">{storeInfo.about}</p>
+          <p className="text-muted-foreground text-base md:text-lg leading-[1.85] text-left max-w-3xl mx-auto whitespace-pre-line">
+            {storeInfo.about}
+          </p>
           <div className="mt-5 flex justify-center">
             <GoogleReviewsPanel variant="compact" />
           </div>
@@ -87,7 +91,7 @@ export function AboutSection() {
                   href={stat.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group text-center glass-card rounded-3xl py-5 px-2 transition-all hover:-translate-y-1 border border-[var(--glass-border)]"
+                  className="group text-center stat-card py-5 px-2 transition-all hover:-translate-y-1"
                 >
                   {content}
                   <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-brand-green opacity-0 group-hover:opacity-100 transition-opacity">
@@ -99,7 +103,7 @@ export function AboutSection() {
             }
 
             return (
-              <div key={stat.label} className="text-center glass-card rounded-3xl py-5 px-2">
+              <div key={stat.label} className="text-center stat-card py-5 px-2">
                 {content}
               </div>
             );

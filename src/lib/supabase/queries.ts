@@ -1,4 +1,10 @@
 import { resolveImageSrc } from "@/lib/brand/logo-asset";
+import {
+  getDbProductImages,
+  buildProductImageFields,
+  getProductPhotoUrls,
+} from "@/lib/products/product-images";
+import { inferImageExtension, inferImageMime } from "@/lib/images/compress-image";
 import type { DbCategory, DbOrder, DbProduct, DbSubCategory, OrderCartLine, OrderStatus } from "@/types/database";
 import type { Product } from "@/types";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -27,15 +33,21 @@ export function slugify(text: string): string {
 }
 
 export function mapDbProduct(row: DbProduct): Product {
-  const image = resolveImageSrc(row.image_url);
+  const images = getDbProductImages(row);
+  const price = Number(row.price);
+  const originalPrice =
+    row.original_price != null && Number(row.original_price) > price
+      ? Number(row.original_price)
+      : undefined;
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     description: row.description,
     longDescription: row.description,
-    price: Number(row.price),
-    images: [image],
+    price,
+    originalPrice,
+    images,
     category: row.category_id,
     subCategory: row.sub_category_id ?? undefined,
     brand: "Kids Junction",
@@ -282,21 +294,99 @@ export async function upsertProduct(product: {
   slug: string;
   description: string;
   price: number;
+  original_price?: number | null;
   category_id: string;
   sub_category_id?: string | null;
   image_url?: string | null;
+  image_urls?: string[];
   stock: number;
   featured: boolean;
 }): Promise<DbProduct> {
   if (!supabase) throw new Error("Supabase not configured");
-  const payload = product.id ? product : { ...product, id: undefined };
-  const { data, error } = await supabase
-    .from("products")
-    .upsert(payload)
-    .select()
-    .single();
+
+  await assertAuthenticatedAdmin();
+
+  const images = buildProductImageFields(product.image_urls ?? []);
+  const originalPrice =
+    product.original_price != null && product.original_price > product.price
+      ? product.original_price
+      : null;
+  const row = {
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    price: product.price,
+    original_price: originalPrice,
+    category_id: product.category_id,
+    sub_category_id: product.sub_category_id ?? null,
+    image_url: images.image_url,
+    image_urls: images.image_urls,
+    stock: product.stock,
+    featured: product.featured,
+  };
+
+  if (product.id) {
+    const { data, error } = await supabase
+      .from("products")
+      .update(row)
+      .eq("id", product.id)
+      .select()
+      .single();
+    if (error) throwQueryError(error);
+    if (!data) throw new Error("Product update failed — no rows were changed.");
+    return data as DbProduct;
+  }
+
+  const { data, error } = await supabase.from("products").insert(row).select().single();
   if (error) throwQueryError(error);
   return data as DbProduct;
+}
+
+export async function updateProductImages(
+  id: string,
+  urls: string[],
+  options?: { allowEmpty?: boolean }
+): Promise<DbProduct> {
+  if (!supabase) throw new Error("Supabase not configured");
+
+  const images = buildProductImageFields(urls);
+  if (images.image_urls.length === 0 && !options?.allowEmpty) {
+    throw new Error("No valid product photos to save.");
+  }
+
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      image_url: images.image_url,
+      image_urls: images.image_urls,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throwQueryError(error);
+  if (!data) throw new Error("Photo save failed — product not found or access denied.");
+
+  if (!options?.allowEmpty) {
+    const saved = getProductPhotoUrls(data as DbProduct);
+    if (saved.length === 0) {
+      throw new Error("Photos were not saved. Please log in again and retry.");
+    }
+  }
+
+  return data as DbProduct;
+}
+
+async function assertAuthenticatedAdmin(): Promise<void> {
+  if (!supabase) throw new Error("Supabase not configured");
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) {
+    throw new Error("Your admin session expired. Please log in again and retry.");
+  }
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -307,15 +397,24 @@ export async function deleteProduct(id: string): Promise<void> {
 
 export async function uploadAdminImage(file: File, folder = "images"): Promise<string> {
   if (!supabase) throw new Error("Supabase not configured");
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const safeName = slugify(file.name.replace(new RegExp(`\\.${ext}$`, "i"), "")) || "image";
+
+  const ext = inferImageExtension(file);
+  const safeName = slugify(file.name.replace(/\.[^.]+$/, "")) || "image";
   const path = `${folder}/${Date.now()}-${safeName}.${ext}`;
+  const contentType = inferImageMime(file);
+
   const { error } = await supabase.storage.from("product-images").upload(path, file, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type || undefined,
+    contentType,
   });
-  if (error) throwQueryError(error);
+  if (error) {
+    const message = error.message.toLowerCase();
+    if (message.includes("row-level security") || message.includes("403") || message.includes("unauthorized")) {
+      throw new Error("Please log in to admin again, then retry the upload.");
+    }
+    throwQueryError(error);
+  }
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
   return data.publicUrl;
 }

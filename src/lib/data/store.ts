@@ -23,7 +23,7 @@ export const storeInfo = {
     note: "Open all days",
   },
   about:
-    "Kids Junction has been Guduvanchery's trusted destination for quality kids clothing, toys, and baby essentials. We handpick every product for safety, comfort, and style — at prices parents love.",
+    "⭐ Kids Junction – Baby & Toy Store | Guduvanchery, Chennai 💓 13+ Years of Trust | 23,000+ Satisfied Customers Kids Junction is an esteemed baby shop in Guduvanchery, Chennai, proudly serving families since 2013 👶🧸. With over 13 years of experience, we have had the privilege of catering to more than 22 000 happy and satisfied customers 😊✨. Our dedication to providing top-quality baby essentials comes from a genuine passion for nurturing little ones 💖. Every product we offer is carefully chosen to support the comfort, safety, and happiness of babies and growing families 🍼🎁🚗. With the love and trust of our customers, we continue to grow stronger day by day 🌟. At Kids Junction, we serve our beloved customers with a loving ❤️ heart",
   mapEmbed:
     "https://maps.google.com/maps?q=133+GST+Road+Guduvanchery+603202&output=embed",
   mapQuery: "133 GST Road Guduvanchery 603202",

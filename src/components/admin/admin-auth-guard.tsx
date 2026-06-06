@@ -15,16 +15,33 @@ export function useAdminAuth() {
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
+    const client = supabase;
+    if (!client) {
       setLoading(false);
-    });
+      return;
+    }
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    let active = true;
+
+    const syncSession = async () => {
+      const { data: refreshed } = await client.auth.refreshSession();
+      if (!active) return;
+
+      const session = refreshed.session ?? (await client.auth.getSession()).data.session;
+      setUser(session?.user ?? null);
+      setLoading(false);
+    };
+
+    void syncSession();
+
+    const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return { user, loading, isConfigured: isSupabaseConfigured };

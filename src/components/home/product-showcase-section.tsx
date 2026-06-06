@@ -8,6 +8,7 @@ import { ShowcaseCard } from "@/components/products/showcase-card";
 import { ProductInquiryModal } from "@/components/products/product-inquiry-modal";
 import { PriceSortSelect } from "@/components/products/price-sort-select";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
+import { DecorativeBg } from "@/components/shared/decorative-bg";
 import { Button } from "@/components/ui/button";
 import { sortProductsByPrice, type PriceSort } from "@/lib/products/sort-products";
 import type { Product } from "@/types";
@@ -56,25 +57,32 @@ export function ProductShowcaseSection({
   };
 
   return (
-    <section id="collection" className="py-16 md:py-24 section-bg-blue section-glow relative theme-surface">
+    <section
+      id="collection"
+      className="py-16 md:py-24 section-bg-blue section-glow relative theme-surface premium-section"
+    >
+      <DecorativeBg variant="blue" />
       <div className="container mx-auto px-4 relative">
-        <ScrollReveal className="text-center mb-8">
+        <ScrollReveal className="text-center mb-8 md:mb-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue/80 mb-2">
+            Handpicked for you
+          </p>
           <h2 className="font-display heading-lg mb-3">
-            Our <span className="text-brand-pink">Collection</span>
+            Our <span className="text-gradient-brand">Collection</span>
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
+          <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
             Browse our collection, add to cart, and order via WhatsApp in minutes.
           </p>
         </ScrollReveal>
 
-        <ScrollReveal className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0 pb-1">
+        <ScrollReveal className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="premium-filter-pill flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0 pb-1">
             <button
               type="button"
               onClick={() => setActiveCategory("all")}
               className={cn(
-                "nav-tab shrink-0 text-xs sm:text-sm",
-                activeCategory === "all" ? "nav-tab-pink nav-tab-active" : "nav-tab-pink"
+                "premium-filter-btn",
+                activeCategory === "all" && "premium-filter-btn--active"
               )}
             >
               All
@@ -85,8 +93,8 @@ export function ProductShowcaseSection({
                 type="button"
                 onClick={() => setActiveCategory(category.id)}
                 className={cn(
-                  "nav-tab shrink-0 nav-tab-blue text-xs sm:text-sm",
-                  activeCategory === category.id && "nav-tab-active"
+                  "premium-filter-btn",
+                  activeCategory === category.id && "premium-filter-btn--active"
                 )}
               >
                 {category.name}

@@ -1,10 +1,16 @@
-import { STATIC_CATEGORY_IDS } from "@/lib/static-export-params";
+import { fetchCategoryIdsForBuild } from "@/lib/supabase/build-fetch";
 import { CategoryPageClient } from "./category-page-client";
 
-export function generateStaticParams() {
-  return STATIC_CATEGORY_IDS.map((id) => ({ id }));
+export async function generateStaticParams() {
+  const ids = await fetchCategoryIdsForBuild();
+  return ids.map((id) => ({ id }));
 }
 
-export default function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
-  return <CategoryPageClient params={params} />;
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <CategoryPageClient categoryId={id} />;
 }

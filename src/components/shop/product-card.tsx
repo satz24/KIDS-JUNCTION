@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -103,11 +103,6 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           <h3 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-brand-green transition-colors">
             {product.name}
           </h3>
-          <div className="flex items-center gap-1">
-            <Star className="h-3.5 w-3.5 fill-yellow text-yellow" />
-            <span className="text-xs font-medium">{product.rating}</span>
-            <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
-          </div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-brand-green">{formatPrice(product.price)}</span>
             {hasDiscount && (

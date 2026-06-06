@@ -48,6 +48,37 @@ create table if not exists public.products (
 -- Upgrade older projects that were created before sub-categories
 alter table public.products add column if not exists sub_category_id text references public.sub_categories (id) on delete set null;
 
+-- Multiple product photos (admin uploads); image_url remains the primary/cover photo
+alter table public.products add column if not exists image_urls jsonb not null default '[]'::jsonb;
+
+-- Optional MRP / list price — when higher than price, storefront shows strikethrough discount
+alter table public.products add column if not exists original_price numeric(10, 2) check (original_price is null or original_price >= 0);
+
+update public.products
+set image_urls = jsonb_build_array(image_url)
+where coalesce(image_url, '') <> ''
+  and (image_urls is null or image_urls = '[]'::jsonb);
+
+-- Remove placeholder logo from image_urls when real upload URLs exist
+update public.products
+set
+  image_urls = (
+    select coalesce(jsonb_agg(value), '[]'::jsonb)
+    from jsonb_array_elements_text(image_urls) as value
+    where value not ilike '%KJ_final.jpg%'
+  ),
+  image_url = (
+    select value
+    from jsonb_array_elements_text(image_urls) as value
+    where value not ilike '%KJ_final.jpg%'
+    limit 1
+  )
+where exists (
+  select 1
+  from jsonb_array_elements_text(image_urls) as value
+  where value not ilike '%KJ_final.jpg%'
+);
+
 create index if not exists products_category_id_idx on public.products (category_id);
 create index if not exists products_featured_idx on public.products (featured);
 create index if not exists products_sub_category_id_idx on public.products (sub_category_id);
@@ -213,8 +244,8 @@ insert into public.categories (id, name, image_url) values
   ('boys', 'Mother Care', '/brand/KJ_final.jpg'),
   ('gift-sets', 'Toys and Games', '/brand/KJ_final.jpg')
 on conflict (id) do update set
-  name = excluded.name,
-  image_url = excluded.image_url;
+  name = excluded.name;
+-- image_url is NOT overwritten on re-run — keeps admin-uploaded category photos
 
 -- Two placeholder sub-categories per category (same name as parent — rename in admin later)
 insert into public.sub_categories (id, category_id, name, sort_order) values
@@ -235,13 +266,34 @@ on conflict (id) do update set
   name = excluded.name,
   sort_order = excluded.sort_order;
 
-insert into public.products (name, slug, description, price, category_id, image_url, stock, featured) values
-  ('Baby Soft Romper Set', 'baby-soft-romper-set', 'Comfortable cotton romper for newborns.', 599, 'baby', '/brand/KJ_final.jpg', 25, true),
-  ('Girls Floral Dress', 'girls-floral-dress', 'Pretty floral dress for parties and play.', 899, 'girls', '/brand/KJ_final.jpg', 20, true),
-  ('Boys Graphic Tee', 'boys-graphic-tee', 'Soft cotton tee with fun print.', 449, 'boys', '/brand/KJ_final.jpg', 40, false),
-  ('Baby Feeding Set', 'baby-feeding-set', 'BPA-free bottles and bowls set.', 699, 'baby-essentials', '/brand/KJ_final.jpg', 15, false),
-  ('Premium Gift Hamper', 'premium-gift-hamper', 'Curated gift set for special occasions.', 1499, 'gift-sets', '/brand/KJ_final.jpg', 10, true),
-  ('Educational Puzzle Pack', 'educational-puzzle-pack', 'Learning puzzles for ages 3+.', 649, 'toys-school', '/brand/KJ_final.jpg', 22, false)
-on conflict (slug) do nothing;
+-- Link existing products to the first sub-category of their parent category
+update public.products p
+set sub_category_id = (
+  select sc.id
+  from public.sub_categories sc
+  where sc.category_id = p.category_id
+  order by sc.sort_order, sc.id
+  limit 1
+)
+where p.sub_category_id is null
+  and exists (
+    select 1 from public.sub_categories sc where sc.category_id = p.category_id
+  );
+
+insert into public.products (name, slug, description, price, category_id, sub_category_id, image_url, stock, featured) values
+  ('Baby Soft Romper Set', 'baby-soft-romper-set', 'Comfortable cotton romper for newborns.', 599, 'baby', 'baby-1', '/brand/KJ_final.jpg', 25, true),
+  ('Girls Floral Dress', 'girls-floral-dress', 'Pretty floral dress for parties and play.', 899, 'girls', 'girls-1', '/brand/KJ_final.jpg', 20, true),
+  ('Boys Graphic Tee', 'boys-graphic-tee', 'Soft cotton tee with fun print.', 449, 'boys', 'boys-1', '/brand/KJ_final.jpg', 40, false),
+  ('Baby Feeding Set', 'baby-feeding-set', 'BPA-free bottles and bowls set.', 699, 'baby-essentials', 'baby-essentials-1', '/brand/KJ_final.jpg', 15, false),
+  ('Premium Gift Hamper', 'premium-gift-hamper', 'Curated gift set for special occasions.', 1499, 'gift-sets', 'gift-sets-1', '/brand/KJ_final.jpg', 10, true),
+  ('Educational Puzzle Pack', 'educational-puzzle-pack', 'Learning puzzles for ages 3+.', 649, 'toys-school', 'toys-school-1', '/brand/KJ_final.jpg', 22, false)
+on conflict (slug) do update set
+  category_id = excluded.category_id,
+  sub_category_id = excluded.sub_category_id,
+  description = excluded.description,
+  price = excluded.price,
+  stock = excluded.stock,
+  featured = excluded.featured;
+-- image_url is NOT overwritten on re-run — keeps admin-uploaded product photos
 
 -- Done.
